@@ -1,0 +1,38 @@
+package ch.epfl.javions;
+
+/**
+ * permet d'effectuer certains calculs mathématiques
+ */
+public final class Math2 {
+
+    /**
+     * constructeur privé
+     */
+    private Math2(){}
+
+    /**
+     * limite la valeur v à l'intervalle allant de min à max
+     * @param min valeur minimale de l'intervalle
+     * @param v valeur donnée
+     * @param max valeur maximale de l'intervalle
+     * @return min si v est inférieure à min, max si v est supérieure à max, et v sinon
+     * @throws IllegalArgumentException si min est (strictement) supérieur à max
+     */
+    public static int clamp(int min, int v, int max){
+        if (min > max) throw new IllegalArgumentException();
+        if (v < min || v > max){
+            if (v < min) return min;
+            if (v > max) return max;
+        }
+        return v;
+    }
+
+    /**
+     * sinus hyperbolique
+     * @param x argument
+     * @return sinus hyperbolique réciproque de son argument x
+     */
+    public static double asinh(double x){
+        return Math.log(x+Math.sqrt(1+Math.pow(x,2)));
+    }
+}

@@ -1,5 +1,8 @@
 package ch.epfl.javions.aircraft;
 
+/**
+ * représente la catégorie de turbulence de sillage d'un aéronef
+ */
 public enum WakeTurbulenceCategory {
 
     LIGHT,
@@ -7,6 +10,11 @@ public enum WakeTurbulenceCategory {
     HEAVY,
     UNKNOWN;
 
+    /**
+     * retourne la catégorie de turbulence de sillage correspondant à la chaîne donnée
+     * @param s la chaine donnée
+     * @return la catégorie de turbulence
+     */
     public static WakeTurbulenceCategory of(String s){
         return switch (s) {
             case "L" -> LIGHT;

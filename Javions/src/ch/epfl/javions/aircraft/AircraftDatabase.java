@@ -5,15 +5,31 @@ import java.util.zip.ZipFile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * représente la base de données mictronics des aéronefs
+ */
 public class AircraftDatabase {
 
     private String fileName;
 
+    /**
+     * constructeur public, retourne un objet représentant la base de données
+     * mictronics, stockée dans le fichier de nom donné
+     * @param fileName nom du ficher
+     * @throws NullPointerException si le paramètre est nul
+     */
     public AircraftDatabase(String fileName){
         if (fileName == null) throw new NullPointerException();
         this.fileName = fileName;
     }
 
+    /**
+     * retourne les données de l'aéronef dont l'adresse OACI est celle donnée,
+     * ou null si aucune entrée n'existe dans la base pour cette adresse
+     * @param address l'adresse OACI donnée
+     * @return  les données de l'aéronef
+     * @throws IOException en cas d'erreur d'entrée
+     */
     public AircraftData get(IcaoAddress address) throws IOException {
         String name = getClass().getResource("/aircraft.zip").getFile();
         try (ZipFile z = new ZipFile(name)){

@@ -8,7 +8,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * représente la base de données mictronics des aéronefs
  */
-public class AircraftDatabase {
+public final class AircraftDatabase {
 
     private String fileName;
 
@@ -31,20 +31,20 @@ public class AircraftDatabase {
      * @throws IOException en cas d'erreur d'entrée
      */
     public AircraftData get(IcaoAddress address) throws IOException {
-        String name = getClass().getResource("/aircraft.zip").getFile();
-        try (ZipFile z = new ZipFile(name)){
-            String firstString = address.string().substring(0,2);
-            InputStream stream = z.getInputStream(z.getEntry(firstString+".csv"));
-            Reader reader = new InputStreamReader(stream, UTF_8);
-            BufferedReader buffer = new BufferedReader(reader);
+        String name = getClass().getResource(fileName).getFile();
+        String firstString = address.string().substring(4,6);
+        try     (ZipFile z = new ZipFile(name);
+                InputStream stream = z.getInputStream(z.getEntry(firstString+".csv"));
+                Reader reader = new InputStreamReader(stream, UTF_8);
+                BufferedReader buffer = new BufferedReader(reader)){
             String line = "";
-            int comparator = -1;
-            while (comparator < 0 && (line = buffer.readLine()) != null){
+            int comparator = 1;
+            while (comparator > 0 && (line = buffer.readLine()) != null){
                 if (line.startsWith(address.string())){
                     comparator = address.string().compareTo(line.substring(0,6));
                 }
             }
-            String[] aircraftData = new String[6];
+            String[] aircraftData;
             if (comparator == 0){
                 String regex = ",";
                 aircraftData = line.split(regex);

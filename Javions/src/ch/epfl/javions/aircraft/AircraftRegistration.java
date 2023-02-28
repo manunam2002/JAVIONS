@@ -5,6 +5,9 @@ import java.util.regex.Pattern;
 /**
  * represente l'immatriculation de l'aéronef
  * @param string immatriculation
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public record AircraftRegistration(String string) {
 

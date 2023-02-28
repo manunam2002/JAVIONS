@@ -4,6 +4,9 @@ package ch.epfl.javions;
  * représente des coordonnées géographiques
  * @param longitudeT32 longitude exprimée en T32
  * @param latitudeT32 latitude exprimée en T32
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public record GeoPos(int longitudeT32, int latitudeT32) {
 

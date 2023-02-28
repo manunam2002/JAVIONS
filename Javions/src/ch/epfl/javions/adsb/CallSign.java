@@ -5,6 +5,9 @@ import java.util.regex.Pattern;
 /**
  * représente l'indicatif d'un aéronef
  * @param string l'indicatif d'un aéronef
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public record CallSign(String string) {
 

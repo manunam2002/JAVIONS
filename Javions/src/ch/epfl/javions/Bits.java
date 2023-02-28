@@ -4,6 +4,9 @@ import java.util.Objects;
 
 /**
  * extrait un sous-ensemble des 64 bits d'une valeur de type long
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public final class Bits {
 

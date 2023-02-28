@@ -2,6 +2,9 @@ package ch.epfl.javions;
 
 /**
  * contient des méthodes permettant de projeter des coordonnées géographiques selon la projection WebMercator
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public final class WebMercator {
 

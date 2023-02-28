@@ -7,6 +7,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * représente la base de données mictronics des aéronefs
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public final class AircraftDatabase {
 

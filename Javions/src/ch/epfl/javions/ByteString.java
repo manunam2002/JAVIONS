@@ -6,6 +6,9 @@ import java.util.Objects;
 
 /**
  * représente une chaîne d'octets
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public final class ByteString {
 

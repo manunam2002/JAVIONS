@@ -2,6 +2,9 @@ package ch.epfl.javions;
 
 /**
  * permet d'effectuer certains calculs mathématiques
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public final class Math2 {
 

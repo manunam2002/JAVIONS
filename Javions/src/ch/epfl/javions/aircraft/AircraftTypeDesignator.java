@@ -5,6 +5,9 @@ import java.util.regex.Pattern;
 /**
  * represente l'indicateur de type
  * @param string indicateur de type
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public record AircraftTypeDesignator(String string) {
 

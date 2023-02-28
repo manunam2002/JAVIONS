@@ -2,6 +2,9 @@ package ch.epfl.javions;
 
 /**
  * représente un calculateur de CRC de 24 bits
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public final class Crc24 {
 

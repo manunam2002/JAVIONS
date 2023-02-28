@@ -11,6 +11,9 @@ import java.util.Objects;
  * @param model modèle de l'aéronef
  * @param description description de l'aéronef
  * @param wakeTurbulenceCategory catégorie de turbulence de sillage d'un aéronef
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public record AircraftData(AircraftRegistration registration, AircraftTypeDesignator typeDesignator, String model,
                            AircraftDescription description, WakeTurbulenceCategory wakeTurbulenceCategory) {

@@ -31,4 +31,11 @@ public class AircraftDatabaseTest {
         assertEquals("L1T",b1.description().string());
         assertEquals(WakeTurbulenceCategory.LIGHT,b1.wakeTurbulenceCategory());
     }
+
+    @Test
+    void aircraftDatabaseWorksWithUnknownAddress() throws IOException {
+        AircraftDatabase a = new AircraftDatabase("/aircraft.zip");
+        AircraftData a1 = a.get(new IcaoAddress("07C008"));
+        assertEquals(null, a1);
+    }
 }

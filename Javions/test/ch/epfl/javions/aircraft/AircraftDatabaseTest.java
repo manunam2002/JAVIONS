@@ -15,7 +15,8 @@ public class AircraftDatabaseTest {
 
     @Test
     void aircraftDatabaseWorksWithValidAddress() throws IOException {
-        AircraftDatabase a = new AircraftDatabase("/aircraft.zip");
+        AircraftDatabase a = new AircraftDatabase("/Users/manucristini/EPFLBA2/CS108/" +
+                "Projets/Javions/resources/aircraft.zip");
         AircraftData a1 = a.get(new IcaoAddress("09C008"));
         assertEquals("XT-BFA",a1.registration().string());
         assertEquals("B722",a1.typeDesignator().string());
@@ -23,7 +24,8 @@ public class AircraftDatabaseTest {
         assertEquals("L3J",a1.description().string());
         assertEquals(WakeTurbulenceCategory.MEDIUM,a1.wakeTurbulenceCategory());
 
-        AircraftDatabase b = new AircraftDatabase("/aircraft.zip");
+        AircraftDatabase b = new AircraftDatabase("/Users/manucristini/EPFLBA2/CS108/" +
+                "Projets/Javions/resources/aircraft.zip");
         AircraftData b1 = a.get(new IcaoAddress("E941FF"));
         assertEquals("CP-3080",b1.registration().string());
         assertEquals("C208",b1.typeDesignator().string());
@@ -34,7 +36,8 @@ public class AircraftDatabaseTest {
 
     @Test
     void aircraftDatabaseWorksWithUnknownAddress() throws IOException {
-        AircraftDatabase a = new AircraftDatabase("/aircraft.zip");
+        AircraftDatabase a = new AircraftDatabase("/Users/manucristini/EPFLBA2/CS108/" +
+                "Projets/Javions/resources/aircraft.zip");
         AircraftData a1 = a.get(new IcaoAddress("07C008"));
         assertEquals(null, a1);
     }

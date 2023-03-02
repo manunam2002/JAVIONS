@@ -1,6 +1,7 @@
 package ch.epfl.javions.aircraft;
 
 import java.io.*;
+import java.net.URLDecoder;
 import java.util.zip.ZipFile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -34,9 +35,11 @@ public final class AircraftDatabase {
      * @throws IOException en cas d'erreur d'entrée
      */
     public AircraftData get(IcaoAddress address) throws IOException {
-        String name = getClass().getResource(fileName).getFile();
+        //String name = getClass().getResource("aircraft.zip").getFile();
+        //name = URLDecoder.decode(name, UTF_8);
+        // fileName???
         String firstString = address.string().substring(4,6);
-        try     (ZipFile z = new ZipFile(name);
+        try     (ZipFile z = new ZipFile(fileName);
                 InputStream stream = z.getInputStream(z.getEntry(firstString+".csv"));
                 Reader reader = new InputStreamReader(stream, UTF_8);
                 BufferedReader buffer = new BufferedReader(reader)){
@@ -50,7 +53,7 @@ public final class AircraftDatabase {
             String[] aircraftData;
             if (comparator == 0){
                 String regex = ",";
-                aircraftData = line.split(regex);
+                aircraftData = line.split(regex, -1);
             } else {
                 return null;
             }

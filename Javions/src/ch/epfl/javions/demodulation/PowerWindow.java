@@ -32,7 +32,7 @@ public final class PowerWindow {
     }
 
     public boolean isFull(){
-
+return true;
     }
 
     public int get(int i){
@@ -43,7 +43,7 @@ public final class PowerWindow {
 
     public void advance() throws IOException{
         if (!isFull()){
-            if (position%2 == 0) oddBatch[position+1] =
+            //if (position%2 == 0) oddBatch[position+1] =
         }
     }
 

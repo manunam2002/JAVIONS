@@ -8,30 +8,44 @@ public final class PowerComputer {
 
     private InputStream stream;
     private int batchSize;
-    private byte[] batchBytes;
+    private SamplesDecoder samplesDecoder;
+    private short[] batchDecoded;
     private short[] lastSamples = new short[8];
-    private int oldIndex = 0;
 
-    public PowerComputer(InputStream stream, int batchSize){
+    public PowerComputer(InputStream stream, int batchSize) throws IOException {
         if (batchSize % 8 != 0 || batchSize <= 0) throw new IllegalArgumentException();
         if (stream == null) throw new NullPointerException();
         this.stream = stream;
         this.batchSize = batchSize;
-        batchBytes = new byte[batchSize*2];
+        samplesDecoder = new SamplesDecoder(stream,batchSize);
+        batchDecoded = new short[batchSize];
     }
 
     public int readBatch(int[] batch) throws IOException{
-        SamplesDecoder samplesDecoder = new SamplesDecoder(stream,batchSize);
-        short[] batchDecoded = new short[batchSize];
-        samplesDecoder.readBatch(batchDecoded);
-        for(int i = 0 ; i < batchDecoded.length ; ++i){
-            lastSamples[oldIndex] = batchDecoded[i];
-            ++oldIndex;
-            if (oldIndex == 8) oldIndex = 0;
-            int pn = (int) (Math.pow((lastSamples[oldIndex]- lastSamples[3]+ lastSamples[5]- lastSamples[7]),2) +
-                    Math.pow((lastSamples[0]- lastSamples[2]+ lastSamples[4]- lastSamples[6]),2));
-            batch[i/8] = pn;
+        int decodedSamples = samplesDecoder.readBatch(batchDecoded);
+        for(int i = 0 ; i < decodedSamples ; ++i){
+            int index = i%8;
+            lastSamples[index] = batchDecoded[i];
+            if (i%2 == 0) batch[i] = powerCalculator(index,lastSamples);
         }
-        return batchDecoded.length;
+        return decodedSamples/2;
+    }
+
+    private int powerCalculator(int index, short[] lastSamples){
+        int[] calculatedIndex = new int[8];
+        for (int i = 0 ; i < 8 ; i++){
+            calculatedIndex[i] = indexCalculator(index,i);
+        }
+        int evenSamples = lastSamples[calculatedIndex[6]]-lastSamples[calculatedIndex[4]]+
+                lastSamples[calculatedIndex[2]]-lastSamples[calculatedIndex[0]];
+        int oddSamples = lastSamples[calculatedIndex[7]]-lastSamples[calculatedIndex[5]]+
+                lastSamples[calculatedIndex[3]]-lastSamples[calculatedIndex[1]];
+        return evenSamples*evenSamples + oddSamples*oddSamples;
+    }
+
+    private int indexCalculator(int index, int j){
+        int indexJ = index-j;
+        if (indexJ < 0) indexJ += 8;
+        return indexJ;
     }
 }

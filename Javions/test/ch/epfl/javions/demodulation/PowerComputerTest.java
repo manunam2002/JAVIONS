@@ -22,11 +22,22 @@ public class PowerComputerTest {
 
     @Test
     void powerComputerConstructorThrowsIllegalArgumentException(){
-
+        assertThrows(IllegalArgumentException.class, () -> new PowerComputer(
+                new FileInputStream("/Users/manucristini/EPFLBA2/CS108/Projets/Javions/resources/samples.bin"),
+                -8));
+        assertThrows(IllegalArgumentException.class, () -> new PowerComputer(
+                new FileInputStream("/Users/manucristini/EPFLBA2/CS108/Projets/Javions/resources/samples.bin"),
+                0));
+        assertThrows(IllegalArgumentException.class, () -> new PowerComputer(
+                new FileInputStream("/Users/manucristini/EPFLBA2/CS108/Projets/Javions/resources/samples.bin"),
+                15));
     }
 
     @Test
-    void powerComputerReadThrowsIllegalArgumentException(){
-
+    void powerComputerReadThrowsIllegalArgumentException() throws IOException{
+        PowerComputer powerComputer = new PowerComputer(new FileInputStream("/Users/manucristini/EPFLBA2/" +
+                "CS108/Projets/Javions/resources/samples.bin"),16);
+        int[] readBatch = new int[15];
+        assertThrows(IllegalArgumentException.class, () -> powerComputer.readBatch(readBatch));
     }
 }

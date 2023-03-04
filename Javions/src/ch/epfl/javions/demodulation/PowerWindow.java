@@ -71,8 +71,8 @@ public final class PowerWindow {
      * et la taille de la fenêtre (exclu)
      */
     public int get(int i){
-        if (i <= 0 || i > windowSize) throw new IndexOutOfBoundsException();
-        int index = position+i;
+        if (i < 0 || i > windowSize) throw new IndexOutOfBoundsException();
+        int index = position+i-currentBatch*batchSize;
         if (index >= batchSize){
             return Batch2[index-batchSize];
         }
@@ -101,7 +101,7 @@ public final class PowerWindow {
      * @throws IOException en cas d'erreur d'entrée
      */
     public void advanceBy(int offset) throws IOException{
-        if (offset <= 0) throw new IllegalArgumentException();
+        if (offset < 0) throw new IllegalArgumentException();
         for(int i = 0 ; i < offset ; ++i){
             advance();
         }

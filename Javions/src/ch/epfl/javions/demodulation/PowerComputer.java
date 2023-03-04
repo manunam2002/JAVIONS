@@ -2,8 +2,11 @@ package ch.epfl.javions.demodulation;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
+/**
+ * représente un calculateur de puissance : un objet capable de calculer les échantillons de puissance
+ * du signal à partir des échantillons signés produits par un décodeur d'échantillons
+ */
 public final class PowerComputer {
 
     private InputStream stream;
@@ -12,25 +15,47 @@ public final class PowerComputer {
     private short[] batchDecoded;
     private short[] lastSamples = new short[8];
 
+    /**
+     * constructeur public
+     * @param stream le flot d'entée donné
+     * @param batchSize la taille des lots
+     * @throws IOException en cas d'erreur d'entrée
+     * @throws IllegalArgumentException si la taille des lots n'est pas un multiple de 8 strictement positif
+     */
     public PowerComputer(InputStream stream, int batchSize) throws IOException {
         if (batchSize % 8 != 0 || batchSize <= 0) throw new IllegalArgumentException();
-        if (stream == null) throw new NullPointerException();
         this.stream = stream;
         this.batchSize = batchSize;
-        samplesDecoder = new SamplesDecoder(stream,batchSize);
-        batchDecoded = new short[batchSize];
+        samplesDecoder = new SamplesDecoder(stream,batchSize*2);
+        batchDecoded = new short[batchSize*2];
     }
 
+    /**
+     * lit depuis le décodeur d'échantillons le nombre d'échantillons nécessaire au calcul d'un lot
+     * d'échantillons de puissance, puis les calcule et les place dans le tableau passé en argument
+     * @param batch le tavleau où sont placés les échantillons de puissance
+     * @return le nombre d'échantillons de puissance placés dans le tableau
+     * @throws IOException en cas d'erreur d'entrée
+     * @throws IllegalArgumentException si la taille du tableau n'est pas égale à la taille d'un lot
+     */
     public int readBatch(int[] batch) throws IOException{
+        if (batch.length != batchSize) throw new IllegalArgumentException();
         int decodedSamples = samplesDecoder.readBatch(batchDecoded);
         for(int i = 0 ; i < decodedSamples ; ++i){
             int index = i%8;
             lastSamples[index] = batchDecoded[i];
-            if (i%2 == 0) batch[i] = powerCalculator(index,lastSamples);
+            if ((i+1)%2 == 0) batch[(i-1)/2] = powerCalculator(index,lastSamples);
         }
         return decodedSamples/2;
     }
 
+    // privé, javadoc?
+    /**
+     * calcule un échantillon de puissance
+     * @param index l'index du dernier échantillon dans le tableau
+     * @param lastSamples les huit derniers échantillons
+     * @return l'échantillon de puissance calculé
+     */
     private int powerCalculator(int index, short[] lastSamples){
         int[] calculatedIndex = new int[8];
         for (int i = 0 ; i < 8 ; i++){

@@ -15,7 +15,7 @@ public final class SamplesDecoder {
 
     /**
      * constructeur public
-     * @param stream le flot d'entrée donnée
+     * @param stream le flot d'entrée donné
      * @param batchSize la taille des lots
      * @throws IOException en cas d'erreur d'entrée
      * @throws IllegalArgumentException si la taille des lots n'est pas strictement positive
@@ -42,8 +42,8 @@ public final class SamplesDecoder {
         int bytesRead = stream.readNBytes(batchBytes, 0, batchSize*2);
         int count = 0;
         for (int i = 0 ; i < batchSize ; ++i){
-            batch[i] = (short) (batchBytes[count+1] << 8);
-            batch[i] = (short) (batch[i] | batchBytes[count]);
+            batch[i] = (short) (0xFF & batchBytes[count]);
+            batch[i] = (short) (batch[i] | batchBytes[count+1] << 8);
             batch[i] -= 2048;
             count += 2;
         }

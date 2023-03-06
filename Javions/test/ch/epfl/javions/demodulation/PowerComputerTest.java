@@ -71,5 +71,6 @@ public class PowerComputerTest {
         for (int i = 1201; i < 1208 ;++i){
             assertEquals(0,readBatch[i]);
         }
+        /////////////////////
     }
 }

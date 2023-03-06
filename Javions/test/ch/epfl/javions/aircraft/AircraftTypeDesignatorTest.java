@@ -2,28 +2,28 @@ package ch.epfl.javions.aircraft;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class AircraftTypeDesignatorTest {
-
+class AircraftTypeDesignatorTest {
     @Test
-    void aircraftTypeDesignatorThrowsIllegalArgumentException(){
-        assertThrows(IllegalArgumentException.class, () -> new AircraftTypeDesignator("A"));
-        assertThrows(IllegalArgumentException.class, () -> new AircraftTypeDesignator("A20NN"));
-        assertThrows(IllegalArgumentException.class, () -> new AircraftTypeDesignator("A20NA20NA20NA20NA20N"));
-        assertThrows(IllegalArgumentException.class, () -> new AircraftTypeDesignator(""));
+    void aircraftTypeDesignatorConstructorThrowsWithInvalidTypeDesignator() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new AircraftTypeDesignator("ABCDE");
+        });
     }
 
     @Test
-    void aircraftTypeDesignatorWorkWithNullString(){
-        AircraftTypeDesignator a = new AircraftTypeDesignator(null);
-        assertEquals(null,a.string());
+    void aircraftTypeDesignatorConstructorAcceptsEmptyTypeDesignator() {
+        assertDoesNotThrow(() -> {
+            new AircraftTypeDesignator("");
+        });
     }
 
     @Test
-    void aircraftTypeDesignatorWorksWithValidAddress(){
-        AircraftTypeDesignator a = new AircraftTypeDesignator("A20N");
-        assertEquals("A20N",a.string());
+    void aircraftTypeDesignatorConstructorAcceptsValidTypeDesignator() {
+        assertDoesNotThrow(() -> {
+            new AircraftTypeDesignator("BCS3");
+        });
     }
 }

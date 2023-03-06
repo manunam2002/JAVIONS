@@ -18,6 +18,7 @@ public record AircraftTypeDesignator(String string) {
      * @param string indicateur de type
      */
     public AircraftTypeDesignator {
-        if (string != null && !type.matcher(string).matches()) throw new IllegalArgumentException();
+        if (!string.equals("") && string != null && !type.matcher(string).matches())
+            throw new IllegalArgumentException();
     }
 }

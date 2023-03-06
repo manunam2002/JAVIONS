@@ -18,6 +18,7 @@ public record AircraftDescription(String string) {
      * @param string description de l'aéronef
      */
     public AircraftDescription {
-        if (string != null && !description.matcher(string).matches()) throw new IllegalArgumentException();
+        if (!string.equals("") && string != null && !description.matcher(string).matches())
+            throw new IllegalArgumentException();
     }
 }

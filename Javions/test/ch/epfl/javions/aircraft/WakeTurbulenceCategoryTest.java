@@ -2,15 +2,19 @@ package ch.epfl.javions.aircraft;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class WakeTurbulenceCategoryTest {
-
+class WakeTurbulenceCategoryTest {
     @Test
-    void wakeTurbulenceCategoryWorksWithValidString(){
-        WakeTurbulenceCategory a = WakeTurbulenceCategory.of("L");
-        assertEquals(WakeTurbulenceCategory.LIGHT, a);
-        WakeTurbulenceCategory b = WakeTurbulenceCategory.of("");
-        assertEquals(WakeTurbulenceCategory.UNKNOWN, b);
+    void wakeTurbulenceCategoryOfWorks() {
+        assertEquals(WakeTurbulenceCategory.LIGHT, WakeTurbulenceCategory.of("L"));
+        assertEquals(WakeTurbulenceCategory.MEDIUM, WakeTurbulenceCategory.of("M"));
+        assertEquals(WakeTurbulenceCategory.HEAVY, WakeTurbulenceCategory.of("H"));
+        assertEquals(WakeTurbulenceCategory.UNKNOWN, WakeTurbulenceCategory.of("X"));
+        assertEquals(WakeTurbulenceCategory.UNKNOWN, WakeTurbulenceCategory.of("l"));
+        assertEquals(WakeTurbulenceCategory.UNKNOWN, WakeTurbulenceCategory.of("m"));
+        assertEquals(WakeTurbulenceCategory.UNKNOWN, WakeTurbulenceCategory.of("h"));
+        assertEquals(WakeTurbulenceCategory.UNKNOWN, WakeTurbulenceCategory.of(""));
+        assertEquals(WakeTurbulenceCategory.UNKNOWN, WakeTurbulenceCategory.of("LIGHT"));
     }
 }

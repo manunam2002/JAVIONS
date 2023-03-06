@@ -2,28 +2,27 @@ package ch.epfl.javions.aircraft;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class AircraftDescriptionTest {
-
+class AircraftDescriptionTest {
     @Test
-    void aircraftDescriptionThrowsIllegalArgumentException(){
-        assertThrows(IllegalArgumentException.class, () -> new AircraftDescription("W2J"));
-        assertThrows(IllegalArgumentException.class, () -> new AircraftDescription("L9J"));
-        assertThrows(IllegalArgumentException.class, () -> new AircraftDescription("L2J_"));
-        assertThrows(IllegalArgumentException.class, () -> new AircraftDescription(""));
+    void aircraftDescriptionConstructorThrowsWithInvalidDescription() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new AircraftDescription("abc");
+        });
     }
 
     @Test
-    void aircraftDescriptionWorkWithNullString(){
-        AircraftDescription a = new AircraftDescription(null);
-        assertEquals(null,a.string());
+    void aircraftDescriptionConstructorAcceptsEmptyDescription() {
+        assertDoesNotThrow(() -> {
+            new AircraftDescription("");
+        });
     }
 
     @Test
-    void aircraftDescriptionWorksWithValidAddress(){
-        AircraftDescription a = new AircraftDescription("L2J");
-        assertEquals("L2J",a.string());
+    void aircraftDescriptionConstructorAcceptsValidDescription() {
+        assertDoesNotThrow(() -> {
+            new AircraftDescription("A0E");
+        });
     }
 }

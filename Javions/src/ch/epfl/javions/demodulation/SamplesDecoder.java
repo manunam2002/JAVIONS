@@ -6,6 +6,9 @@ import java.io.InputStream;
 /**
  * représente un décodeur d'échantillons : un objet capable de transformer les octets
  * provenant de la AirSpy en des échantillons de 12 bits signés
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public final class SamplesDecoder {
 

@@ -7,6 +7,9 @@ import java.util.Arrays;
 /**
  * représente une fenêtre de taille fixe sur une séquence d'échantillons de puissance
  * produits par un calculateur de puissance
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public final class PowerWindow {
 

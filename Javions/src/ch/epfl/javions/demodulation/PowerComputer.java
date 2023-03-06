@@ -6,6 +6,9 @@ import java.io.InputStream;
 /**
  * représente un calculateur de puissance : un objet capable de calculer les échantillons de puissance
  * du signal à partir des échantillons signés produits par un décodeur d'échantillons
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
  */
 public final class PowerComputer {
 
@@ -49,7 +52,6 @@ public final class PowerComputer {
         return decodedSamples/2;
     }
 
-    // privé, javadoc?
     /**
      * calcule un échantillon de puissance
      * @param index l'index du dernier échantillon dans le tableau
@@ -68,6 +70,12 @@ public final class PowerComputer {
         return evenSamples*evenSamples + oddSamples*oddSamples;
     }
 
+    /**
+     * calcule les bons index pour la formule qui calcule l'échantillon de puissance
+     * @param index l'index courant
+     * @param j l'index à calculer
+     * @return le bon index
+     */
     private int indexCalculator(int index, int j){
         int indexJ = index-j;
         if (indexJ < 0) indexJ += 8;

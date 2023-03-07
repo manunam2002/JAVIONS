@@ -66,4 +66,13 @@ public class SamplesDecoderTest {
         samplesDecoder1.readBatch(readBatch1);
         assertEquals(-2048,readBatch1[2402]);
     }
+
+    @Test
+    void readBatchReturnsTheCorrectNumber() throws IOException{
+        String name = getClass().getResource("/samples.bin").getFile();
+        name = URLDecoder.decode(name, UTF_8);
+        SamplesDecoder samplesDecoder = new SamplesDecoder(new FileInputStream(name),2410);
+        short[] readBatch = new short[2410];
+        assertEquals(2402,samplesDecoder.readBatch(readBatch));
+    }
 }

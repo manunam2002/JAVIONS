@@ -73,4 +73,13 @@ public class PowerComputerTest {
         }
         /////////////////////
     }
+
+    @Test
+    void readBatchReturnsTheCorrectNumber() throws IOException{
+        String name = getClass().getResource("/samples.bin").getFile();
+        name = URLDecoder.decode(name, UTF_8);
+        PowerComputer powerComputer = new PowerComputer(new FileInputStream(name),1208);
+        int[] readBatch = new int[1208];
+        assertEquals(1201,powerComputer.readBatch(readBatch));
+    }
 }

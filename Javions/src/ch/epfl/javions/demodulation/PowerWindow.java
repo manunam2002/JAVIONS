@@ -21,6 +21,7 @@ public final class PowerWindow {
     private int position;
     private int currentBatch;
     private final int batchSize = 65536;
+    private int batchRead;
 
     /**
      * constructeur public
@@ -37,7 +38,7 @@ public final class PowerWindow {
         powerComputer = new PowerComputer(stream,batchSize);
         Batch1 = new int[batchSize];
         Batch2 = new int[batchSize];
-        powerComputer.readBatch(Batch1);
+        batchRead = powerComputer.readBatch(Batch1);
         currentBatch = 0;
     }
 
@@ -62,7 +63,7 @@ public final class PowerWindow {
      * @return vrai ssi la fenêtre contient autant d'échantillons que sa taille
      */
     public boolean isFull(){
-        if (position+windowSize >= batchSize) return false; //à controler !!
+        if (position+windowSize >= batchRead) return false;
         return true;
     }
 
@@ -89,7 +90,7 @@ public final class PowerWindow {
     public void advance() throws IOException{
         ++position;
         if (position+windowSize >= batchSize){
-            powerComputer.readBatch(Batch2);
+            batchRead += powerComputer.readBatch(Batch2);
         }
         if (position >= batchSize){
             Batch1 = Arrays.copyOf(Batch2,batchSize);

@@ -89,10 +89,10 @@ public final class PowerWindow {
      */
     public void advance() throws IOException{
         ++position;
-        if (position+windowSize >= batchSize){
+        if (position+windowSize == batchSize*(currentBatch+1)){
             batchRead += powerComputer.readBatch(Batch2);
         }
-        if (position >= batchSize){
+        if (position == batchSize*(currentBatch+1)){
             Batch1 = Arrays.copyOf(Batch2,batchSize);
             position = 0;
             ++currentBatch;

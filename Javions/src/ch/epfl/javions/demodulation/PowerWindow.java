@@ -55,7 +55,7 @@ public final class PowerWindow {
      * @return la position actuelle
      */
     public long position(){
-        return (long) currentBatch*batchSize + position;
+        return position;
     }
 
     /**
@@ -63,8 +63,7 @@ public final class PowerWindow {
      * @return vrai ssi la fenêtre contient autant d'échantillons que sa taille
      */
     public boolean isFull(){
-        if (position+windowSize >= batchRead) return false;
-        return true;
+        return (position + windowSize) < batchRead;
     }
 
     /**
@@ -94,7 +93,6 @@ public final class PowerWindow {
         }
         if (position == batchSize*(currentBatch+1)){
             Batch1 = Arrays.copyOf(Batch2,batchSize);
-            position = 0;
             ++currentBatch;
         }
     }

@@ -8,7 +8,7 @@ import java.io.InputStream;
 
 public final class PrintRawMessages {
     public static void main(String[] args) throws IOException {
-        String f = "samples_20230304_1442.bin";
+        String f = "/Users/manucristini/EPFLBA2/CS108/Projets/Javions/resources/samples_20230304_1442.bin";
         try (InputStream s = new FileInputStream(f)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;

@@ -43,12 +43,10 @@ public final class SamplesDecoder {
     public int readBatch(short[] batch) throws IOException{
         if (batch.length != batchSize) throw new IllegalArgumentException();
         int bytesRead = stream.readNBytes(batchBytes, 0, batchSize*2);
-        int count = 0;
         for (int i = 0 ; i < batchSize ; ++i){
-            batch[i] = (short) (0xFF & batchBytes[count]);
-            batch[i] = (short) (batch[i] | batchBytes[count+1] << 8);
+            batch[i] = (short) (0xFF & batchBytes[2*i]);
+            batch[i] = (short) (batch[i] | batchBytes[2*i+1] << 8);
             batch[i] -= 2048;
-            count += 2;
         }
         return bytesRead/2;
     }

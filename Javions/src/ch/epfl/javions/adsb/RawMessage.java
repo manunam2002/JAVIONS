@@ -35,13 +35,13 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
 
     //à verifier
     public IcaoAddress icaoAddress(){
-        int iCAO = (int) bytes.bytesInRange(1,3); //1,4?
+        int iCAO = (int) bytes.bytesInRange(1,4);
         return new IcaoAddress(Integer.toHexString(iCAO));
     }
 
     public long payload(){
-        return bytes.bytesInRange(4,10);
-    } //4,11?
+        return bytes.bytesInRange(4,11);
+    }
 
     public int typeCode(){
         return typeCode(payload());

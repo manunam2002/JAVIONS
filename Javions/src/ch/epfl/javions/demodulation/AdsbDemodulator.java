@@ -6,19 +6,35 @@ import ch.epfl.javions.adsb.RawMessage;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * représente un démodulateur de messages ADS-B
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
+ */
 public class AdsbDemodulator {
 
     private long timeStampNs = 0;
 
-    private final double timeInterval = 100; //500; //100? 2.3, troisième paragraphe
+    private final double timeInterval = 100;
 
     private PowerWindow powerWindow;
 
+    /**
+     * constructeur public
+     * @param samplesStream le flot donné
+     * @throws IOException en cas d'erreur d'entrée
+     */
     public AdsbDemodulator(InputStream samplesStream) throws IOException{
         powerWindow = new PowerWindow(samplesStream,1200);
     }
 
-    public RawMessage nextMessage() throws IOException{ //à verifier
+    /**
+     * retourne le prochain message ADS-B du flot d'échantillons passé au constructeur ou null s'il n'y en a plus
+     * @return le prochain message ADS-B du flot d'échantillons
+     * @throws IOException en cas d'erreur d'entrée
+     */
+    public RawMessage nextMessage() throws IOException{
         RawMessage rawMessage = null;
         while (rawMessage == null) {
             while (!preambleTest()) {
@@ -52,9 +68,13 @@ public class AdsbDemodulator {
             }
             if (!powerWindow.isFull()) break;
         }
-        return rawMessage; //
+        return rawMessage;
     }
 
+    /**
+     * vérifie si un préambule commence au début de la fenêtre
+     * @return true si un préambule commence au début de la fenêtre, false sinon
+     */
     private boolean preambleTest(){
         int sumHigh = powerWindow.get(1) + powerWindow.get(11) + powerWindow.get(36) + powerWindow.get(46);
         int sumLow = powerWindow.get(6) + powerWindow.get(16) + powerWindow.get(21) + powerWindow.get(26) +
@@ -64,6 +84,11 @@ public class AdsbDemodulator {
         return ((sumHigh >= 2 * sumLow) && (sumHigh>sumHighRight) && (sumHigh>sumHighLeft));
     }
 
+    /**
+     * compare la puissance du signal au centre de deux périodes de 0.5 millisecondes
+     * @param index l'index donné
+     * @return true si l'inpulsion transmise correspond à 1, false sinon
+     */
     private boolean bitsDecoder(int index){
         return !(powerWindow.get(80+(10*index)) < powerWindow.get(85+(10*index)));
     }

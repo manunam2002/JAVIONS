@@ -21,7 +21,6 @@ public class AdsbDemodulator {
     public RawMessage nextMessage() throws IOException{ //à verifier
         RawMessage rawMessage = null;
         while (rawMessage == null) {
-            if (!powerWindow.isFull()) break;
             while (!preambleTest()) {
                 powerWindow.advance();
                 timeStampNs += timeInterval;
@@ -51,26 +50,8 @@ public class AdsbDemodulator {
                 timeStampNs += timeInterval;
                 powerWindow.advance();
             }
+            if (!powerWindow.isFull()) break;
         }
-            /*for (int index = 8 ; index < 112 ; ++index){
-                if (bitsDecoder(index))
-                    message[index/8] = (byte) (message[index/8] | 0x80 >>> (index%8));
-            }
-            int df = (message[0] & 0xFF) >>> 3;
-            if (df == 17){
-                rawMessage = RawMessage.of(timeStampNs,message);
-                if (rawMessage != null){
-                    timeStampNs += 1200*timeInterval;
-                    powerWindow.advanceBy(1200);
-                } else {
-                    timeStampNs += timeInterval;
-                    powerWindow.advance();
-                }
-            } else {
-                timeStampNs += timeInterval;
-                powerWindow.advance();
-            }
-        }*/
         return rawMessage;
     }
 

@@ -18,10 +18,10 @@ public final class PowerWindow {
     private PowerComputer powerComputer;
     private int[] Batch1;
     private int[] Batch2;
-    private int position;
-    private int currentBatch;
+    private int position = 0;
+    private int currentBatch = 0;
     private final int batchSize = 65536;
-    private int batchRead;
+    private int batchRead = 0;
 
     /**
      * constructeur public
@@ -38,8 +38,7 @@ public final class PowerWindow {
         powerComputer = new PowerComputer(stream,batchSize);
         Batch1 = new int[batchSize];
         Batch2 = new int[batchSize];
-        batchRead = powerComputer.readBatch(Batch1);
-        currentBatch = 0;
+        batchRead += powerComputer.readBatch(Batch1);
     }
 
     /**
@@ -63,7 +62,7 @@ public final class PowerWindow {
      * @return vrai ssi la fenêtre contient autant d'échantillons que sa taille
      */
     public boolean isFull(){
-        return (position + windowSize) < batchRead;
+        return ((position + windowSize) < batchRead);
     }
 
     /**
@@ -74,7 +73,7 @@ public final class PowerWindow {
      * et la taille de la fenêtre (exclu)
      */
     public int get(int i){
-        if (i < 0 || i > windowSize) throw new IndexOutOfBoundsException();
+        if (i < 0 || i >= windowSize) throw new IndexOutOfBoundsException();
         int index = position+i-currentBatch*batchSize;
         if (index >= batchSize){
             return Batch2[index-batchSize];

@@ -65,11 +65,11 @@ public class PowerWindowTest {
         String name = getClass().getResource("/samples.bin").getFile();
         name = URLDecoder.decode(name, UTF_8);
         PowerWindow powerWindow = new PowerWindow(new FileInputStream(name), 10);
-        //assertTrue(powerWindow.isFull());
+        assertTrue(powerWindow.isFull());
         powerWindow.advanceBy(1000);
-        //assertTrue(powerWindow.isFull());
+        assertTrue(powerWindow.isFull());
         powerWindow.advanceBy(64530);
-        //assertFalse(powerWindow.isFull());
+        assertFalse(powerWindow.isFull());
 
         String f = "/Users/manucristini/EPFLBA2/CS108/Projets/Javions/resources/samples_20230304_1442.bin";
         PowerWindow powerWindow1 = new PowerWindow(new FileInputStream(f), 1200);

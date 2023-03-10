@@ -52,7 +52,7 @@ public class AdsbDemodulator {
             }
             if (!powerWindow.isFull()) break;
         }
-        return rawMessage;
+        return rawMessage; //
     }
 
     private boolean preambleTest(){

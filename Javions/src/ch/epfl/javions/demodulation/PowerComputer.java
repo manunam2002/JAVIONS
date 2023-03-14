@@ -36,7 +36,7 @@ public final class PowerComputer {
     /**
      * lit depuis le décodeur d'échantillons le nombre d'échantillons nécessaire au calcul d'un lot
      * d'échantillons de puissance, puis les calcule et les place dans le tableau passé en argument
-     * @param batch le tavleau où sont placés les échantillons de puissance
+     * @param batch le tableau où sont placés les échantillons de puissance
      * @return le nombre d'échantillons de puissance placés dans le tableau
      * @throws IOException en cas d'erreur d'entrée
      * @throws IllegalArgumentException si la taille du tableau n'est pas égale à la taille d'un lot

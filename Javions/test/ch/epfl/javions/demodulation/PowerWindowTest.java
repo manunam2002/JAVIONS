@@ -2,122 +2,150 @@ package ch.epfl.javions.demodulation;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URLDecoder;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Base64;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PowerWindowTest {
+class PowerWindowTest {
+    private static final int BATCH_SIZE = 1 << 16;
+    private static final int BATCH_SIZE_BYTES = bytesForPowerSamples(BATCH_SIZE);
+    private static final int STANDARD_WINDOW_SIZE = 1200;
+    private static final int BIAS = 1 << 11;
 
-    @Test
-    void powerWindowWorksWithGivenInputStream() throws IOException {
-        String name = getClass().getResource("/samples.bin").getFile();
-        name = URLDecoder.decode(name, UTF_8);
-        PowerWindow powerWindow = new PowerWindow(new FileInputStream(name), 10);
+    private static int bytesForPowerSamples(int powerSamplesCount) {
+        return powerSamplesCount * 2 * Short.BYTES;
     }
 
     @Test
-    void powerWindowConstructorThrowsIllegalArgumentException(){
-        String name = getClass().getResource("/samples.bin").getFile();
-        name = URLDecoder.decode(name, UTF_8);
-        final String fileName = name;
-        assertThrows(IllegalArgumentException.class, () -> new PowerWindow(
-                new FileInputStream(fileName), 0));
-        assertThrows(IllegalArgumentException.class, () -> new PowerWindow(
-                new FileInputStream(fileName), 65537));
-        assertThrows(IllegalArgumentException.class, () -> new PowerWindow(
-                new FileInputStream(fileName), -3));
-        assertThrows(IllegalArgumentException.class, () -> new PowerWindow(
-                new FileInputStream(fileName), 66000));
+    void powerWindowConstructorThrowsWithInvalidWindowSize() throws IOException {
+        try (var s = InputStream.nullInputStream()) {
+            assertThrows(IllegalArgumentException.class, () -> new PowerWindow(s, 0));
+            assertThrows(IllegalArgumentException.class, () -> new PowerWindow(s, -1));
+            assertThrows(IllegalArgumentException.class, () -> new PowerWindow(s, (1 << 16) + 1));
+        }
     }
 
     @Test
-    void powerWindowSizeWorks() throws IOException{
-        String name = getClass().getResource("/samples.bin").getFile();
-        name = URLDecoder.decode(name, UTF_8);
-        PowerWindow powerWindow = new PowerWindow(new FileInputStream(name), 10);
-        assertEquals(10,powerWindow.size());
-        PowerWindow powerWindow1 = new PowerWindow(new FileInputStream(name), 1);
-        assertEquals(1,powerWindow1.size());
-        PowerWindow powerWindow2 = new PowerWindow(new FileInputStream(name), 65536);
-        assertEquals(65536,powerWindow2.size());
+    void powerWindowSizeReturnsWindowSize() throws IOException {
+        try (var s = InputStream.nullInputStream()) {
+            for (var i = 1; i <= 1 << 16; i <<= 1) {
+                var w = new PowerWindow(s, i);
+                assertEquals(i, w.size());
+            }
+        }
     }
 
     @Test
-    void powerWindowPositionWorks() throws IOException{
-        String name = getClass().getResource("/samples.bin").getFile();
-        name = URLDecoder.decode(name, UTF_8);
-        PowerWindow powerWindow = new PowerWindow(new FileInputStream(name), 10);
-        assertEquals(0,powerWindow.position());
-        powerWindow.advance();
-        assertEquals(1,powerWindow.position());
-        powerWindow.advanceBy(8);
-        assertEquals(9,powerWindow.position());
-        powerWindow.advanceBy(1191);
-        assertEquals(1200,powerWindow.position());
-    }
+    void powerWindowPositionIsCorrectlyUpdatedByAdvance() throws IOException {
+        var batches16 = new byte[BATCH_SIZE_BYTES * 16];
+        try (var s = new ByteArrayInputStream(batches16)) {
+            var w = new PowerWindow(s, STANDARD_WINDOW_SIZE);
+            var expectedPos = 0L;
 
-    // à contrôler !!
-    @Test
-    void powerWindowIsFullWorks() throws IOException{
-        String name = getClass().getResource("/samples.bin").getFile();
-        name = URLDecoder.decode(name, UTF_8);
-        PowerWindow powerWindow = new PowerWindow(new FileInputStream(name), 10);
-        assertTrue(powerWindow.isFull());
-        powerWindow.advanceBy(1000);
-        assertTrue(powerWindow.isFull());
-        powerWindow.advanceBy(64530);
-        assertFalse(powerWindow.isFull());
+            assertEquals(expectedPos, w.position());
 
-        String f = "/Users/manucristini/EPFLBA2/CS108/Projets/Javions/resources/samples_20230304_1442.bin";
-        PowerWindow powerWindow1 = new PowerWindow(new FileInputStream(f), 1200);
-        assertTrue(powerWindow1.isFull());
-        powerWindow1.advanceBy(74998799);
-        assertTrue(powerWindow1.isFull());
-        powerWindow1.advance();
-        assertFalse(powerWindow1.isFull());
+            w.advance();
+            expectedPos += 1;
+            assertEquals(expectedPos, w.position());
+
+            w.advanceBy(BATCH_SIZE);
+            expectedPos += BATCH_SIZE;
+            assertEquals(expectedPos, w.position());
+
+            w.advanceBy(BATCH_SIZE - 1);
+            expectedPos += BATCH_SIZE - 1;
+            assertEquals(expectedPos, w.position());
+
+            w.advance();
+            expectedPos += 1;
+            assertEquals(expectedPos, w.position());
+        }
     }
 
     @Test
-    void powerWindowGetWorks() throws IOException{
-        String name = getClass().getResource("/samples.bin").getFile();
-        name = URLDecoder.decode(name, UTF_8);
-        PowerWindow powerWindow = new PowerWindow(new FileInputStream(name), 10);
-        assertEquals(73,powerWindow.get(0));
-        assertEquals(4226,powerWindow.get(5));
-        assertEquals(23825,powerWindow.get(9));
-        powerWindow.advanceBy(1201);
-        assertEquals(0,powerWindow.get(0));
+    void powerWindowAdvanceByCanAdvanceOverSeveralBatches() throws IOException {
+        var bytes = bytesForZeroSamples(16);
+
+        var batchesToSkipOver = 2;
+        var inBatchOffset = 37;
+        var offset = batchesToSkipOver * BATCH_SIZE + inBatchOffset;
+        var sampleBytes = Base64.getDecoder().decode(PowerComputerTest.SAMPLES_BIN_BASE64);
+        System.arraycopy(sampleBytes, 0, bytes, bytesForPowerSamples(offset), sampleBytes.length);
+
+        try (var s = new ByteArrayInputStream(bytes)) {
+            var w = new PowerWindow(s, STANDARD_WINDOW_SIZE);
+            w.advanceBy(inBatchOffset);
+            w.advanceBy(batchesToSkipOver * BATCH_SIZE);
+            var expected = Arrays.copyOfRange(PowerComputerTest.POWER_SAMPLES, 0, STANDARD_WINDOW_SIZE);
+            var actual = new int[STANDARD_WINDOW_SIZE];
+            for (var i = 0; i < STANDARD_WINDOW_SIZE; i += 1) actual[i] = w.get(i);
+            assertArrayEquals(expected, actual);
+        }
     }
 
     @Test
-    void powerWindowAdvanceWorks() throws IOException{
-        String name = getClass().getResource("/samples.bin").getFile();
-        name = URLDecoder.decode(name, UTF_8);
-        PowerWindow powerWindow = new PowerWindow(new FileInputStream(name), 9);
-        assertEquals(36818,powerWindow.get(8));
-        assertEquals(73,powerWindow.get(0));
-        powerWindow.advance();
-        assertEquals(23825,powerWindow.get(8));
-        assertEquals(292,powerWindow.get(0));
-        powerWindow.advance();
-        assertEquals(23825,powerWindow.get(7));
-        assertEquals(65,powerWindow.get(0));
+    void powerWindowIsFullWorks() throws IOException {
+        var twoBatchesPlusOneWindowBytes =
+                bytesForPowerSamples(BATCH_SIZE * 2 + STANDARD_WINDOW_SIZE);
+        var twoBatchesPlusOneWindow = new byte[twoBatchesPlusOneWindowBytes];
+        try (var s = new ByteArrayInputStream(twoBatchesPlusOneWindow)) {
+            var w = new PowerWindow(s, STANDARD_WINDOW_SIZE);
+            assertTrue(w.isFull());
+
+            w.advanceBy(BATCH_SIZE);
+            assertTrue(w.isFull());
+
+            w.advanceBy(BATCH_SIZE);
+            assertTrue(w.isFull());
+
+            w.advance();
+            assertFalse(w.isFull());
+        }
     }
 
     @Test
-    void powerWindowAdvanceByWorks() throws IOException{
-        String name = getClass().getResource("/samples.bin").getFile();
-        name = URLDecoder.decode(name, UTF_8);
-        PowerWindow powerWindow = new PowerWindow(new FileInputStream(name), 6);
-        assertEquals(4226,powerWindow.get(5));
-        assertEquals(73,powerWindow.get(0));
-        powerWindow.advanceBy(4);
-        assertEquals(23825,powerWindow.get(5));
-        assertEquals(98,powerWindow.get(0));
-        powerWindow.advanceBy(5);
-        assertEquals(23825,powerWindow.get(0));
+    void powerWindowGetWorksOnGivenSamples() throws IOException {
+        try (var sampleStream = PowerComputerTest.getSamplesStream()) {
+            var windowSize = 100;
+            var w = new PowerWindow(sampleStream, windowSize);
+            for (var offset = 0; offset < 100; offset += 1) {
+                var expected = Arrays.copyOfRange(PowerComputerTest.POWER_SAMPLES, offset, offset + windowSize);
+                var actual = new int[windowSize];
+                for (var i = 0; i < windowSize; i += 1) actual[i] = w.get(i);
+                assertArrayEquals(expected, actual);
+                w.advance();
+            }
+        }
+    }
+
+    @Test
+    void powerWindowGetWorksAcrossBatches() throws IOException {
+        byte[] bytes = bytesForZeroSamples(2);
+        var firstBatchSamples = STANDARD_WINDOW_SIZE / 2 - 13;
+        var offset = BATCH_SIZE_BYTES - bytesForPowerSamples(firstBatchSamples);
+        var sampleBytes = Base64.getDecoder().decode(PowerComputerTest.SAMPLES_BIN_BASE64);
+        System.arraycopy(sampleBytes, 0, bytes, offset, sampleBytes.length);
+        try (var s = new ByteArrayInputStream(bytes)) {
+            var w = new PowerWindow(s, STANDARD_WINDOW_SIZE);
+            w.advanceBy(BATCH_SIZE - firstBatchSamples);
+            for (int i = 0; i < STANDARD_WINDOW_SIZE; i += 1)
+                assertEquals(PowerComputerTest.POWER_SAMPLES[i], w.get(i));
+        }
+    }
+
+    private static byte[] bytesForZeroSamples(int batchesCount) {
+        var bytes = new byte[BATCH_SIZE_BYTES * batchesCount];
+
+        var msbBias = BIAS >> Byte.SIZE;
+        var lsbBias = BIAS & ((1 << Byte.SIZE) - 1);
+        for (var i = 0; i < bytes.length; i += 2) {
+            bytes[i] = (byte) lsbBias;
+            bytes[i + 1] = (byte) msbBias;
+        }
+        return bytes;
     }
 }

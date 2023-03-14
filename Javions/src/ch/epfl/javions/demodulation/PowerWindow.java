@@ -62,7 +62,7 @@ public final class PowerWindow {
      * @return vrai ssi la fenêtre contient autant d'échantillons que sa taille
      */
     public boolean isFull(){
-        return ((position + windowSize) < batchRead);
+        return ((position + windowSize) <= batchRead);
     }
 
     /**

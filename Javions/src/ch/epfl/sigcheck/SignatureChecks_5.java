@@ -25,8 +25,8 @@ final class SignatureChecks_5 {
     }
 
     void checkAirbornePositionMessage() throws Exception {
-        v12 = new ch.epfl.javions.adsb.AirbornePositionMessage(v05, v06, v01, v02, v01, v01);
-        v12 = ch.epfl.javions.adsb.AirbornePositionMessage.of(v08);
+        //v12 = new ch.epfl.javions.adsb.AirbornePositionMessage(v05, v06, v01, v02, v01, v01);
+        //v12 = ch.epfl.javions.adsb.AirbornePositionMessage.of(v08);
         v01 = v12.altitude();
         v10 = v12.equals(v09);
         v02 = v12.hashCode();

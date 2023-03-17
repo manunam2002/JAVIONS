@@ -1,6 +1,5 @@
 package ch.epfl.javions.demodulation;
 
-import ch.epfl.javions.ByteString;
 import ch.epfl.javions.adsb.RawMessage;
 
 import java.io.IOException;
@@ -16,9 +15,9 @@ public final class AdsbDemodulator {
 
     private long timeStampNs = 0;
 
-    private final double timeInterval = 100;
+    private final static int timeInterval = 100;
 
-    private PowerWindow powerWindow;
+    private final PowerWindow powerWindow;
 
     /**
      * constructeur public

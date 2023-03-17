@@ -1,7 +1,6 @@
 package ch.epfl.javions.aircraft;
 
 import java.io.*;
-import java.net.URLDecoder;
 import java.util.zip.ZipFile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -14,7 +13,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public final class AircraftDatabase {
 
-    private String fileName;
+    private final String fileName;
 
     /**
      * constructeur public, retourne un objet représentant la base de données

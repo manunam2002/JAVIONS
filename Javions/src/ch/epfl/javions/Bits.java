@@ -40,7 +40,6 @@ public final class Bits {
         Objects.checkIndex(index,Long.SIZE);
         long l = value << Long.SIZE - (index+1);
         long l1 = l >>> Long.SIZE - 1;
-        if (l1 == 1) return true;
-        return false;
+        return l1 == 1;
     }
 }

@@ -12,9 +12,8 @@ import java.io.InputStream;
  */
 public final class PowerComputer {
 
-    private InputStream stream;
-    private int batchSize;
-    private SamplesDecoder samplesDecoder;
+    private final int batchSize;
+    private final SamplesDecoder samplesDecoder;
     private short[] batchDecoded;
     private short[] lastSamples = new short[8];
 
@@ -27,7 +26,6 @@ public final class PowerComputer {
      */
     public PowerComputer(InputStream stream, int batchSize) throws IOException {
         if (batchSize % 8 != 0 || batchSize <= 0) throw new IllegalArgumentException();
-        this.stream = stream;
         this.batchSize = batchSize;
         samplesDecoder = new SamplesDecoder(stream,batchSize*2);
         batchDecoded = new short[batchSize*2];

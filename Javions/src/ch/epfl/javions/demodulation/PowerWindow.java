@@ -13,9 +13,8 @@ import java.util.Arrays;
  */
 public final class PowerWindow {
 
-    private InputStream stream;
-    private int windowSize;
-    private PowerComputer powerComputer;
+    private final int windowSize;
+    private final PowerComputer powerComputer;
     private int[] Batch1;
     private int[] Batch2;
     private int position = 0;
@@ -33,7 +32,6 @@ public final class PowerWindow {
      */
     public PowerWindow(InputStream stream, int windowSize) throws IOException{
         if (windowSize <= 0 || windowSize > batchSize) throw new IllegalArgumentException();
-        this.stream = stream;
         this.windowSize = windowSize;
         powerComputer = new PowerComputer(stream,batchSize);
         Batch1 = new int[batchSize];

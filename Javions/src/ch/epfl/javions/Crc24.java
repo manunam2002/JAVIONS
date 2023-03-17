@@ -12,7 +12,7 @@ public final class Crc24 {
      * générateur utilisé pour calculer le CRC24 des messages ADS-B
      */
     public final static int GENERATOR = 0xFFF409;
-    private int generator1;
+    private final int generator1;
     private int[] table;
 
     /**

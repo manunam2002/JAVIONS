@@ -12,19 +12,18 @@ import java.io.InputStream;
  */
 public final class SamplesDecoder {
 
-    private InputStream stream;
-    private int batchSize;
+    private final InputStream stream;
+    private final int batchSize;
     private byte[] batchBytes;
 
     /**
      * constructeur public
      * @param stream le flot d'entrée donné
      * @param batchSize la taille des lots
-     * @throws IOException en cas d'erreur d'entrée
      * @throws IllegalArgumentException si la taille des lots n'est pas strictement positive
      * @throws NullPointerException si le flot est nul
      */
-    public SamplesDecoder(InputStream stream, int batchSize) throws IOException {
+    public SamplesDecoder(InputStream stream, int batchSize) {
         if (batchSize <= 0) throw new IllegalArgumentException();
         if (stream == null) throw new NullPointerException();
         this.stream = stream;

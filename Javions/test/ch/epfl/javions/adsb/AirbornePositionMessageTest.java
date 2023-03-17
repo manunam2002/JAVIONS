@@ -35,4 +35,16 @@ public class AirbornePositionMessageTest {
         RawMessage rawMessage = new RawMessage(0, new ByteString(bytes));
         assertEquals(null,AirbornePositionMessage.of(rawMessage));
     }
+
+    @Test
+    void AirbornePositionAltitudeWorksWithGrayCodes(){
+        byte[] bytes1 = new byte[] {(byte)0x8D,(byte)0x39,(byte)0x20,(byte)0x35,(byte)0x59,(byte)0xB2,(byte)0x25,
+                (byte)0xF0,(byte)0x75,(byte)0x50,(byte)0xAD,(byte)0xBE,(byte)0x32,(byte)0x8F};
+        RawMessage rawMessage1 = new RawMessage(0,new ByteString(bytes1));
+        assertEquals(3474.72,AirbornePositionMessage.of(rawMessage1).altitude(),0.01);
+        byte[] bytes2 = new byte[] {(byte)0x8D,(byte)0xAE,(byte)0x02,(byte)0xC8,(byte)0x58,(byte)0x64,(byte)0xA5,
+                (byte)0xF5,(byte)0xDD,(byte)0x49,(byte)0x75,(byte)0xA1,(byte)0xA3,(byte)0xF5};
+        RawMessage rawMessage2 = new RawMessage(0,new ByteString(bytes2));
+        assertEquals(7315.20,AirbornePositionMessage.of(rawMessage2).altitude(),0.01);
+    }
 }

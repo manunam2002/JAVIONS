@@ -2,7 +2,6 @@ package ch.epfl.javions;
 
 import java.util.Arrays;
 import java.util.HexFormat;
-import java.util.Objects;
 
 /**
  * représente une chaîne d'octets
@@ -78,8 +77,7 @@ public final class ByteString {
         long l = 0;
         for (int i = 0 ; i < toIndex-fromIndex ; ++i){
             long l1 = (long) byteAt(toIndex - i - 1) << 8*i;
-            long l2 = l | l1;
-            l = l2;
+            l = l | l1;
         }
         return l;
     }
@@ -88,7 +86,7 @@ public final class ByteString {
     public boolean equals(Object obj) {
         if (obj instanceof ByteString){
             if (((ByteString) obj).size() == this.size()){
-                if (Arrays.equals(this.bytes, ((ByteString) obj).bytes)) return true;
+                return Arrays.equals(this.bytes, ((ByteString) obj).bytes);
             }
         }
         return false;

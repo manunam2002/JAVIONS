@@ -1,7 +1,5 @@
 package ch.epfl.javions.aircraft;
 
-import ch.epfl.javions.Units;
-
 import java.util.Objects;
 
 /**

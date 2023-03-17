@@ -12,7 +12,7 @@ import java.io.InputStream;
  * @author Manu Cristini (358484)
  * @author Youssef Esseddik (346488)
  */
-public class AdsbDemodulator {
+public final class AdsbDemodulator {
 
     private long timeStampNs = 0;
 
@@ -63,8 +63,8 @@ public class AdsbDemodulator {
                     powerWindow.advance();
                 }
             } else {
-                timeStampNs += timeInterval;
                 powerWindow.advance();
+                timeStampNs += timeInterval;
             }
             if (!powerWindow.isFull()) break;
         }

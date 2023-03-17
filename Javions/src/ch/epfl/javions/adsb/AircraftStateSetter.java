@@ -29,7 +29,7 @@ public interface AircraftStateSetter {
     void setCallSign(CallSign callSign);
 
     /**
-     * hange la position de l'aéronef à la valeur donnée
+     * change la position de l'aéronef à la valeur donnée
      * @param position la valeur donnée
      */
     void setPosition(GeoPos position);

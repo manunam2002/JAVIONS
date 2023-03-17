@@ -14,8 +14,17 @@ public final class PrintRawMessages {
         try (InputStream s = new FileInputStream(f)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
-            while ((m = d.nextMessage()) != null)
-                System.out.println(m);
+            while ((m = d.nextMessage()) != null){
+                if (m.typeCode() > 0 && m.typeCode() < 5){
+                    AircraftIdentificationMessage m1 = AircraftIdentificationMessage.of(m);
+                    System.out.println(m1);
+                }
+                if ((m.typeCode() > 8 && m.typeCode() < 19)||(m.typeCode() > 19 && m.typeCode() < 23)){
+                    System.out.println(m);
+                    AirbornePositionMessage m2 = AirbornePositionMessage.of(m);
+                    System.out.println(m2);
+                }
+            }
         }
         long end2 = System.currentTimeMillis();
         System.out.println("Elapsed Time in milli seconds: "+ (end2-start2));

@@ -3,6 +3,12 @@ package ch.epfl.javions.adsb;
 import ch.epfl.javions.GeoPos;
 import ch.epfl.javions.Units;
 
+/**
+ * représente un décodeur de position CPR
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
+ */
 public class CprDecoder {
 
     private static final int latZones0 = 60;
@@ -14,6 +20,16 @@ public class CprDecoder {
 
     private static final double lonZonesCalculator = 1 - Math.cos(2 * Math.PI * (1.0/latZones0));
 
+    /**
+     * retourne la positon géographique correspondant aux positions locales normalisées données
+     * @param x0 la longitude locale d'un message pair
+     * @param y0 la latitude locale d'un message pair
+     * @param x1 la longitude locale d'un message impair
+     * @param y1 la latitude locale d'un message impair
+     * @param mostRecent l'index des positions les plus récentes
+     * @return la positon géographique correspondant aux positions locales normalisées données
+     * @throws IllegalArgumentException si mostRecent ne vaut pas 0 ou 1
+     */
     public static GeoPos decodePosition(double x0, double y0, double x1, double y1, int mostRecent){
         if ((mostRecent != 0) && (mostRecent != 1)) throw new IllegalArgumentException();
         int latZone = (int) Math.rint(y0*latZones1 - y1*latZones0);
@@ -26,13 +42,13 @@ public class CprDecoder {
             latZone0 = latZone;
             latZone1 = latZone;
         }
-        double latZone0Rad = Units.convertFrom(latZone0,Units.Angle.TURN);
-        double latZone1Rad = Units.convertFrom(latZone1,Units.Angle.TURN);
         double lat0 = (1.0/latZones0) * (latZone0 + y0);
         double lat1 = (1.0/latZones1) * (latZone1 + y1);
+        double lat0Rad = Units.convertFrom(lat0,Units.Angle.TURN);
+        double lat1Rad = Units.convertFrom(lat1,Units.Angle.TURN);
         if (lat0 < minLat || lat0 > maxLat) return null;
-        double a0 = Math.acos(1 - (lonZonesCalculator / (Math.cos(latZone0Rad) * Math.cos(latZone0Rad))));
-        double a1 = Math.acos(1 - (lonZonesCalculator / (Math.cos(latZone1Rad) * Math.cos(latZone1Rad))));
+        double a0 = Math.acos(1 - (lonZonesCalculator / (Math.cos(lat0Rad) * Math.cos(lat0Rad))));
+        double a1 = Math.acos(1 - (lonZonesCalculator / (Math.cos(lat1Rad) * Math.cos(lat1Rad))));
         int lonZones0;
         if (Double.isNaN(a0)){
             lonZones0 = 1;

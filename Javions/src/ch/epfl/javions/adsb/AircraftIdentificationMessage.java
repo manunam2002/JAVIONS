@@ -2,14 +2,39 @@ package ch.epfl.javions.adsb;
 
 import ch.epfl.javions.aircraft.IcaoAddress;
 
+/**
+ * représente un message ADS-B d'identification et de catégorie
+ * @param timeStampNs l'horodatage du message, en nanosecondes
+ * @param icaoAddress l'adresse OACI de l'expéditeur du message
+ * @param category la catégorie d'aéronef de l'expéditeur
+ * @param callSign l'indicatif de l'expéditeur
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
+ */
 public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAddress,
         int category, CallSign callSign) implements Message {
 
+    /**
+     * constructeur compact
+     * @param timeStampNs l'horodatage du message, en nanosecondes
+     * @param icaoAddress l'adresse OACI de l'expéditeur du message
+     * @param category la catégorie d'aéronef de l'expéditeur
+     * @param callSign l'indicatif de l'expéditeur
+     * @throws NullPointerException si icaoAddress ou callSign sont nuls
+     * @throws IllegalArgumentException si timeStampNs est strictement inférieure à 0
+     */
     public AircraftIdentificationMessage{
         if (icaoAddress == null || callSign == null) throw new NullPointerException();
         if (timeStampNs < 0) throw new IllegalArgumentException();
     }
 
+    /**
+     * retourne le message d'identification correspondant au message brut donné,
+     * ou null si au moins un des caractères de l'indicatif qu'il contient est invalide
+     * @param rawMessage le message brut donné
+     * @return le message d'identification correspondant au message brut donné
+     */
     public static AircraftIdentificationMessage of(RawMessage rawMessage){
         int category1 = (rawMessage.bytes().byteAt(4)) & 0x7;
         int category2 = (14-rawMessage.typeCode())<<4;
@@ -31,7 +56,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
             callSign1.append(c1);
         }
         return new AircraftIdentificationMessage(rawMessage.timeStampNs(),rawMessage.icaoAddress(),
-                category1,new CallSign(callSign1.toString()));
+                category1,new CallSign(callSign1.toString().stripTrailing()));
     }
 
     @Override
@@ -44,10 +69,18 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
         return icaoAddress;
     }
 
+    /**
+     * retourne l'indicatif de l'expéditeur du message
+     * @return l'indicatif de l'expéditeur du message
+     */
     public CallSign callSign() {
         return callSign;
     }
 
+    /**
+     * retourne la catégorie de l'expéditeur du message
+     * @return la catégorie de l'expéditeur du message
+     */
     public int category() {
         return category;
     }

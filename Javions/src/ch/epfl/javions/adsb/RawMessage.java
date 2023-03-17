@@ -4,6 +4,8 @@ import ch.epfl.javions.ByteString;
 import ch.epfl.javions.Crc24;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
+import java.util.HexFormat;
+
 /**
  * représente un message ADS-B
  * @param timeStampNs l'horodatage du message exprimé en nanosecondes depuis une origine donnée
@@ -69,7 +71,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return le format du message
      */
     public int downLinkFormat(){
-        return bytes.byteAt(0);
+        return (bytes.byteAt(0)>>>3);
     }
 
     /**
@@ -78,8 +80,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      */
     public IcaoAddress icaoAddress(){
         int iCAO = (int) bytes.bytesInRange(1,4);
-        String iCAOString = Integer.toHexString(iCAO);
-        return new IcaoAddress(Integer.toHexString(iCAO).toUpperCase());
+        return new IcaoAddress(HexFormat.of().withUpperCase().toHexDigits(iCAO, 6));
     }
 
     /**

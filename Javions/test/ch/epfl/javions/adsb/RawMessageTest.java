@@ -13,9 +13,9 @@ public class RawMessageTest {
     @Test
     void RawMessageConstructorThrowsIllegalArgumentException(){
         assertThrows(IllegalArgumentException.class, () -> new RawMessage(-1,new ByteString(new byte[14])));
-        assertThrows(IllegalArgumentException.class, () -> new RawMessage(-1,new ByteString(new byte[13])));
-        assertThrows(IllegalArgumentException.class, () -> new RawMessage(-1,new ByteString(new byte[0])));
-        assertThrows(IllegalArgumentException.class, () -> new RawMessage(-1,new ByteString(new byte[15])));
+        assertThrows(IllegalArgumentException.class, () -> new RawMessage(0,new ByteString(new byte[13])));
+        assertThrows(IllegalArgumentException.class, () -> new RawMessage(0,new ByteString(new byte[0])));
+        assertThrows(IllegalArgumentException.class, () -> new RawMessage(0,new ByteString(new byte[15])));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class RawMessageTest {
         byte[] bytes = new byte[] {(byte)0x8D,(byte)0x4B,(byte)0x17,(byte)0xE5,(byte)0xF8,(byte)0x21,(byte)0x00,
                 (byte)0x02,(byte)0x00,(byte)0x4B,(byte)0xB8,(byte)0xB1,(byte)0xF1,(byte)0xAC};
         RawMessage rawMessage = new RawMessage(0,new ByteString(bytes));
-        assertEquals(0x8D,rawMessage.downLinkFormat());
+        assertEquals(17,rawMessage.downLinkFormat());
     }
 
     @Test

@@ -36,6 +36,7 @@ public final class AdsbDemodulator {
     public RawMessage nextMessage() throws IOException{
         RawMessage rawMessage = null;
         while (rawMessage == null) {
+            if (!powerWindow.isFull()) break;
             while (!preambleTest()) {
                 powerWindow.advance();
                 timeStampNs += timeInterval;
@@ -65,7 +66,6 @@ public final class AdsbDemodulator {
                 powerWindow.advance();
                 timeStampNs += timeInterval;
             }
-            if (!powerWindow.isFull()) break;
         }
         return rawMessage;
     }

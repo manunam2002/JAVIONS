@@ -52,7 +52,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return la taille d'un message
      */
     public static int size(byte byte0){
-        if (byte0 == 17) return LENGTH;
+        if (((byte0>>>3)&0b11111) == 17) return LENGTH;
         return 0;
     }
 
@@ -62,7 +62,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return le code de type
      */
     public static int typeCode(long payload){
-        long typeCode = payload >>> 51;
+        long typeCode = (payload >>> 51) & 0b11111;
         return (int) typeCode;
     }
 

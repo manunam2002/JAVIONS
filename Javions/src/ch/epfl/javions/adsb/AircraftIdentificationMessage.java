@@ -37,7 +37,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      */
     public static AircraftIdentificationMessage of(RawMessage rawMessage){
         int category1 = (rawMessage.bytes().byteAt(4)) & 0x7;
-        int category2 = (14-rawMessage.typeCode())<<4;
+        int category2 = ((14-rawMessage.typeCode())&0b1111)<<4;
         category1 = category2 | category1;
         StringBuilder callSign1 = new StringBuilder();
         long callSignValue = rawMessage.bytes().bytesInRange(5,11);

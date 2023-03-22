@@ -1,9 +1,7 @@
 package ch.epfl.javions.adsb;
 
-import ch.epfl.javions.Units;
-import ch.epfl.javions.aircraft.IcaoAddress;
-
 public class MessageParser {
+
     public static Message parse(RawMessage rawMessage) {
         if (rawMessage.typeCode() > 0 && rawMessage.typeCode() < 5) {
             return AircraftIdentificationMessage.of(rawMessage);

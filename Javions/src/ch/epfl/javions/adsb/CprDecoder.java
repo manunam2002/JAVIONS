@@ -44,9 +44,9 @@ public class CprDecoder {
         }
         double lat0 = (1.0/latZones0) * (latZone0 + y0);
         double lat1 = (1.0/latZones1) * (latZone1 + y1);
+        if (lat0 < minLat || lat0 > maxLat) return null;
         double lat0Rad = Units.convertFrom(lat0,Units.Angle.TURN);
         double lat1Rad = Units.convertFrom(lat1,Units.Angle.TURN);
-        if (lat0 < minLat || lat0 > maxLat) return null;
         double a0 = Math.acos(1 - (lonZonesCalculator / (Math.cos(lat0Rad) * Math.cos(lat0Rad))));
         double a1 = Math.acos(1 - (lonZonesCalculator / (Math.cos(lat1Rad) * Math.cos(lat1Rad))));
         int lonZones0;
@@ -73,12 +73,12 @@ public class CprDecoder {
         if (mostRecent == 0){
             if (lon0 > 0.5) lon0 -= 1;
             if (lat0 > 0.5) lat0 -= 1;
-            return new GeoPos((int) Units.convert(lon0,Units.Angle.TURN,Units.Angle.T32),
-                    (int) Units.convert(lat0,Units.Angle.TURN,Units.Angle.T32));
+            return new GeoPos((int) Math.rint(Units.convert(lon0,Units.Angle.TURN,Units.Angle.T32)),
+                    (int) Math.rint(Units.convert(lat0,Units.Angle.TURN,Units.Angle.T32)));
         }
         if (lon1 > 0.5) lon1 -= 1;
         if (lat1 > 0.5) lat1 -= 1;
-        return new GeoPos((int) Units.convert(lon1,Units.Angle.TURN,Units.Angle.T32),
-                (int) Units.convert(lat1,Units.Angle.TURN,Units.Angle.T32));
+        return new GeoPos((int) Math.rint(Units.convert(lon1,Units.Angle.TURN,Units.Angle.T32)),
+                (int) Math.rint(Units.convert(lat1,Units.Angle.TURN,Units.Angle.T32)));
     }
 }

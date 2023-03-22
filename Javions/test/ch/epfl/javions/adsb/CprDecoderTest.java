@@ -38,4 +38,15 @@ public class CprDecoderTest {
         double x1 = Math.scalb(108865,-17);
         assertEquals(null,CprDecoder.decodePosition(x0,y0,x1,y1,0));
     }
+
+    @Test
+    void decodePositionReturnsTheExactValues(){
+        var x0 = Math.scalb(111600d, -17);
+        var y0 = Math.scalb(94445d, -17);
+        var x1 = Math.scalb(108865d, -17);
+        var y1 = Math.scalb(77558d, -17);
+        var p = CprDecoder.decodePosition(x0, y0, x1, y1, 0);
+        assertEquals( 89192898, p.longitudeT32());
+        assertEquals(552659081,p.latitudeT32());
+    }
 }

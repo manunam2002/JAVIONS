@@ -20,12 +20,13 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             int Vew = (int) ((NUC >>> 11) & 0b1111111111);
             int Dew = (int) ((NUC >>> 21) & 0b1);
             if (Vns == 0 || Vew == 0) return null;
-            ++Vns;
-            ++Vew;
+            --Vns;
+            --Vew;
             double velocity = Math.hypot(Vns,Vew);
             if (Dns == 1) Vns = -Vns;
             if (Dew == 1) Vew = -Vew;
-            double angle = Math.atan2(Vns,Vew);
+            double angle = Math.atan2(Vew,Vns);
+            if (angle < 0) angle = 2*Math.PI + angle;
             if (subType == 1) return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
                     Units.convert(velocity,Units.Speed.KNOT,Units.Speed.METER_PER_SECOND), angle);
             return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
@@ -44,5 +45,15 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
                     Units.convert(AS*4,Units.Speed.KNOT,Units.Speed.METER_PER_SECOND), angle);
         }
         return null;
+    }
+
+    @Override
+    public long timeStampNs() {
+        return timeStampNs;
+    }
+
+    @Override
+    public IcaoAddress icaoAddress() {
+        return icaoAddress;
     }
 }

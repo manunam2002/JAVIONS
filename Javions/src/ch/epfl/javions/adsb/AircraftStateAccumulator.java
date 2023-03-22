@@ -1,12 +1,12 @@
 package ch.epfl.javions.adsb;
 
-import ch.epfl.javions.GeoPos;
-
 public class AircraftStateAccumulator <T extends AircraftStateSetter> {
 
     private T stateSetter;
 
-    private AirbornePositionMessage lastPositionMessage;
+    private AirbornePositionMessage lastPositionMessage0;
+    private AirbornePositionMessage lastPositionMessage1;
+
 
     public AircraftStateAccumulator(T stateSetter){
         if (stateSetter == null) throw new NullPointerException();
@@ -16,6 +16,7 @@ public class AircraftStateAccumulator <T extends AircraftStateSetter> {
     public T stateSetter(){
         return stateSetter;
     }
+
     public void update(Message message){
         switch (message){
             case AircraftIdentificationMessage aim -> {
@@ -26,12 +27,19 @@ public class AircraftStateAccumulator <T extends AircraftStateSetter> {
             case AirbornePositionMessage aim -> {
                 stateSetter.setLastMessageTimeStampNs(aim.timeStampNs());
                 stateSetter.setAltitude(aim.altitude());
-                if (aim.timeStampNs()-lastPositionMessage.timeStampNs() <= 10000){
-                    switch (aim.parity()){
-                        case 1 -> stateSetter.setPosition(CprDecoder.decodePosition(lastPositionMessage.x(),
-                                lastPositionMessage.y(), aim.x(), aim.y(),1));
-                        default -> stateSetter.setPosition(CprDecoder.decodePosition(aim.x(), aim.y(),
-                                lastPositionMessage.x(), lastPositionMessage.y(), 0));
+                if (aim.parity() == 1) {
+                    lastPositionMessage1 = aim;
+                    if ((lastPositionMessage0 != null) &&
+                            (aim.timeStampNs() - lastPositionMessage0.timeStampNs() <= 10E9)) {
+                        stateSetter.setPosition(CprDecoder.decodePosition(lastPositionMessage0.x(),
+                                lastPositionMessage0.y(), aim.x(), aim.y(), 1));
+                    }
+                } else {
+                    lastPositionMessage0 = aim;
+                    if ((lastPositionMessage1 != null) &&
+                            (aim.timeStampNs() - lastPositionMessage1.timeStampNs() <= 10E9)) {
+                        stateSetter.setPosition(CprDecoder.decodePosition(aim.x(),
+                                aim.y(), lastPositionMessage1.x(), lastPositionMessage1.y(), 0));
                     }
                 }
             }
@@ -43,7 +51,4 @@ public class AircraftStateAccumulator <T extends AircraftStateSetter> {
             default -> {}
         }
     }
-
-
-
 }

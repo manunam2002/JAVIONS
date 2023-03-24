@@ -1,6 +1,7 @@
 package ch.epfl.javions.adsb;
 
 import ch.epfl.javions.Bits;
+import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.Units;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
@@ -39,8 +40,8 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
      */
     public AirbornePositionMessage{
         if (icaoAddress == null) throw new NullPointerException();
-        if (timeStampNs < 0 || (parity != 0 && parity != 1) || (x < 0 || x >= 1) || (y < 0 || y >= 1))
-            throw new IllegalArgumentException();
+        Preconditions.checkArgument(timeStampNs >= 0 && (parity == 0 || parity == 1) &&
+                (x >= 0 && x < 1) && (y >= 0 && y < 1));
     }
 
     /**

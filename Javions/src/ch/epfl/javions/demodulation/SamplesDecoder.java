@@ -1,5 +1,7 @@
 package ch.epfl.javions.demodulation;
 
+import ch.epfl.javions.Preconditions;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -14,7 +16,7 @@ public final class SamplesDecoder {
 
     private final InputStream stream;
     private final int batchSize;
-    private byte[] batchBytes;
+    private final byte[] batchBytes;
 
     /**
      * constructeur public
@@ -24,7 +26,7 @@ public final class SamplesDecoder {
      * @throws NullPointerException si le flot est nul
      */
     public SamplesDecoder(InputStream stream, int batchSize) {
-        if (batchSize <= 0) throw new IllegalArgumentException();
+        Preconditions.checkArgument(!(batchSize <= 0));
         if (stream == null) throw new NullPointerException();
         this.stream = stream;
         this.batchSize = batchSize;
@@ -40,7 +42,7 @@ public final class SamplesDecoder {
      * @throws IllegalArgumentException si la taille du tableau passé en argument n'est pas égale à la taille d'un lot
      */
     public int readBatch(short[] batch) throws IOException{
-        if (batch.length != batchSize) throw new IllegalArgumentException();
+        Preconditions.checkArgument(batch.length == batchSize);
         int bytesRead = stream.readNBytes(batchBytes, 0, batchSize*2);
         for (int i = 0 ; i < batchSize ; ++i){
             batch[i] = (short) (0xFF & batchBytes[2*i]);

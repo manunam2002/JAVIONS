@@ -1,5 +1,7 @@
 package ch.epfl.javions.aircraft;
 
+import ch.epfl.javions.Preconditions;
+
 import java.util.regex.Pattern;
 
 /**
@@ -16,8 +18,9 @@ public record IcaoAddress(String string) {
     /**
      * constructeur compact
      * @param string la chaîne contenant la représentation textuelle de l'adresse OACI
+     * @throws IllegalArgumentException si la chaine ne représente pas une adresse OACI valide
      */
     public IcaoAddress {
-        if (!oACI.matcher(string).matches()) throw new IllegalArgumentException();
+        Preconditions.checkArgument(oACI.matcher(string).matches());
     }
 }

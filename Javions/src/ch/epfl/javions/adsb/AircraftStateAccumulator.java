@@ -1,22 +1,43 @@
 package ch.epfl.javions.adsb;
 
+/**
+ * représente un objet accumulant les messages ADS-B provenant d'un seul aéronef
+ * afin de déterminer son état au cours du temps
+ * @param <T> paramètre générique de l'objet représentant l'état modifiable d'un aéronef
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
+ */
 public class AircraftStateAccumulator <T extends AircraftStateSetter> {
 
-    private T stateSetter;
+    private final T stateSetter;
 
     private AirbornePositionMessage lastPositionMessage0;
     private AirbornePositionMessage lastPositionMessage1;
 
 
+    /**
+     * constructeur public
+     * @param stateSetter l'état modifiable donné
+     * @throws NullPointerException si l'état modifiable donné est nul
+     */
     public AircraftStateAccumulator(T stateSetter){
         if (stateSetter == null) throw new NullPointerException();
         this.stateSetter = stateSetter;
     }
 
+    /**
+     * retourne l'état modifiable de l'aéronef passé à son constructeur
+     * @return l'état modifiable de l'aéronef passé à son constructeur
+     */
     public T stateSetter(){
         return stateSetter;
     }
 
+    /**
+     * met à jour l'état modifiable en fonction du message donné
+     * @param message le message donné
+     */
     public void update(Message message){
         switch (message){
             case AircraftIdentificationMessage aim -> {

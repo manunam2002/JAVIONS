@@ -1,16 +1,42 @@
 package ch.epfl.javions.adsb;
 
+import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.Units;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
+/**
+ * représente un message de vitesse en vol
+ * @param timeStampNs l'horodatage du message, en nanosecondes
+ * @param icaoAddress l'adresse OACI de l'expéditeur du message
+ * @param speed la vitesse de l'aéronef, en m/s
+ * @param trackOrHeading la direction de déplacement de l'aéronef
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
+ */
 public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress, double speed, double trackOrHeading)
         implements Message{
 
+    /**
+     * constructeur compact
+     * @param timeStampNs l'horodatage du message, en nanosecondes
+     * @param icaoAddress l'adresse OACI de l'expéditeur du message
+     * @param speed la vitesse de l'aéronef, en m/s
+     * @param trackOrHeading la direction de déplacement de l'aéronef
+     * @throws NullPointerException si icaoAddress est nul
+     * @throws IllegalArgumentException si timeStampNs, speed ou trackOrHeading sont strictement négatifs
+     */
     public AirborneVelocityMessage{
         if (icaoAddress == null) throw new NullPointerException();
-        if (timeStampNs < 0 || speed < 0 || trackOrHeading < 0) throw new IllegalArgumentException();
+        Preconditions.checkArgument(timeStampNs >= 0 && speed >= 0 && trackOrHeading >= 0);
     }
 
+    /**
+     * retourne le message de vitesse en vol correspondant au message brut donné, ou null si le sous-type est invalide,
+     * ou si la vitesse ou la direction de déplacement ne peuvent pas être déterminés
+     * @param rawMessage le message brut donné
+     * @return le message de vitesse en vol correspondant au message brut donné
+     */
     public static AirborneVelocityMessage of(RawMessage rawMessage){
         int subType = (rawMessage.bytes().byteAt(4) & 0b111);
         if (subType == 1 || subType == 2){

@@ -13,7 +13,7 @@ public final class Crc24 {
      */
     public final static int GENERATOR = 0xFFF409;
     private final int generator1;
-    private int[] table;
+    private final int[] table;
 
     /**
      * constructeur public
@@ -75,7 +75,7 @@ public final class Crc24 {
      * @return le CRC24 correspondant
      */
     public int crc_basic(byte[] bytes){
-        return crc_bitwise(GENERATOR,bytes);
+        return crc_bitwise(generator1,bytes);
     }
 
     /**

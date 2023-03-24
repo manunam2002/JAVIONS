@@ -11,6 +11,11 @@ import java.util.Objects;
 public final class Bits {
 
     /**
+     * constructeur privé
+     */
+    private Bits(){}
+
+    /**
      * qui extrait du vecteur de 64 bits value la plage de size bits commençant au bit d'index start,
      * qu'elle interprète comme une valeur non signée,
      * @param value valeur donnée
@@ -22,7 +27,7 @@ public final class Bits {
      * entre 0 (inclus) et 64 (exclu)
      */
     public static int extractUInt(long value, int start, int size){
-        if (size <= 0 || size >= Integer.SIZE) throw new IllegalArgumentException();
+        Preconditions.checkArgument(!(size <= 0 || size >= Integer.SIZE));
         Objects.checkFromIndexSize(start, size, Long.SIZE);
         long l = value << Long.SIZE-(size+start);
         long l1 = l >>> Long.SIZE - size;

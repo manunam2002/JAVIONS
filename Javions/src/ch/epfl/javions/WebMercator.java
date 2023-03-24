@@ -9,6 +9,11 @@ package ch.epfl.javions;
 public final class WebMercator {
 
     /**
+     * constructeur privé
+     */
+    private WebMercator(){}
+
+    /**
      * la coordonnée x correspondant à la longitude donnée en radians au niveau de zoom donné
      * @param zoomLevel niveau de zoom
      * @param longitude longitude en radians

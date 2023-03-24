@@ -22,11 +22,9 @@ public final class Math2 {
      * @throws IllegalArgumentException si min est (strictement) supérieur à max
      */
     public static int clamp(int min, int v, int max){
-        if (min > max) throw new IllegalArgumentException();
-        if (v < min || v > max){
-            if (v < min) return min;
-            if (v > max) return max;
-        }
+        Preconditions.checkArgument(!(min > max));
+        if (v < min) return min;
+        if (v > max) return max;
         return v;
     }
 

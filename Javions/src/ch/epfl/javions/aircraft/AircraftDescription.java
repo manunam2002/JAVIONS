@@ -1,5 +1,7 @@
 package ch.epfl.javions.aircraft;
 
+import ch.epfl.javions.Preconditions;
+
 import java.util.regex.Pattern;
 
 /**
@@ -16,9 +18,10 @@ public record AircraftDescription(String string) {
     /**
      * constructeur compact
      * @param string description de l'aéronef
+     * @throws IllegalArgumentException si la chaine n'est pas vide et ne représente pas une description valide
      */
     public AircraftDescription {
-        if (!string.equals("") && string != null && !description.matcher(string).matches())
-            throw new IllegalArgumentException();
+        Preconditions.checkArgument(string.equals("") || string == null
+                || description.matcher(string).matches());
     }
 }

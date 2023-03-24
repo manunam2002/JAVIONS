@@ -1,5 +1,7 @@
 package ch.epfl.javions.demodulation;
 
+import ch.epfl.javions.Preconditions;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -16,7 +18,7 @@ public final class PowerWindow {
     private final int windowSize;
     private final PowerComputer powerComputer;
     private int[] Batch1;
-    private int[] Batch2;
+    private final int[] Batch2;
     private int position = 0;
     private int currentBatch = 0;
     private final int batchSize = 65536;
@@ -31,7 +33,7 @@ public final class PowerWindow {
      * et 65536 (la taille d'un lot)
      */
     public PowerWindow(InputStream stream, int windowSize) throws IOException{
-        if (windowSize <= 0 || windowSize > batchSize) throw new IllegalArgumentException();
+        Preconditions.checkArgument(windowSize > 0 && windowSize <= batchSize);
         this.windowSize = windowSize;
         powerComputer = new PowerComputer(stream,batchSize);
         Batch1 = new int[batchSize];

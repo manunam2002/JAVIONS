@@ -1,5 +1,7 @@
 package ch.epfl.javions.demodulation;
 
+import ch.epfl.javions.Preconditions;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -14,18 +16,17 @@ public final class PowerComputer {
 
     private final int batchSize;
     private final SamplesDecoder samplesDecoder;
-    private short[] batchDecoded;
-    private short[] lastSamples = new short[8];
+    private final short[] batchDecoded;
+    private final short[] lastSamples = new short[8];
 
     /**
      * constructeur public
      * @param stream le flot d'entée donné
      * @param batchSize la taille des lots
-     * @throws IOException en cas d'erreur d'entrée
      * @throws IllegalArgumentException si la taille des lots n'est pas un multiple de 8 strictement positif
      */
-    public PowerComputer(InputStream stream, int batchSize) throws IOException {
-        if (batchSize % 8 != 0 || batchSize <= 0) throw new IllegalArgumentException();
+    public PowerComputer(InputStream stream, int batchSize){
+        Preconditions.checkArgument(batchSize % 8 == 0 && batchSize > 0);
         this.batchSize = batchSize;
         samplesDecoder = new SamplesDecoder(stream,batchSize*2);
         batchDecoded = new short[batchSize*2];
@@ -40,7 +41,7 @@ public final class PowerComputer {
      * @throws IllegalArgumentException si la taille du tableau n'est pas égale à la taille d'un lot
      */
     public int readBatch(int[] batch) throws IOException{
-        if (batch.length != batchSize) throw new IllegalArgumentException();
+        Preconditions.checkArgument(batch.length == batchSize);
         int decodedSamples = samplesDecoder.readBatch(batchDecoded);
         for(int i = 0 ; i < decodedSamples ; ++i){
             int index = i%8;

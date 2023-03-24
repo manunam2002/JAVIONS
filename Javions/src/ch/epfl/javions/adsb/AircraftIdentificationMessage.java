@@ -1,5 +1,6 @@
 package ch.epfl.javions.adsb;
 
+import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
 /**
@@ -26,7 +27,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      */
     public AircraftIdentificationMessage{
         if (icaoAddress == null || callSign == null) throw new NullPointerException();
-        if (timeStampNs < 0) throw new IllegalArgumentException();
+        Preconditions.checkArgument(timeStampNs >= 0);
     }
 
     /**

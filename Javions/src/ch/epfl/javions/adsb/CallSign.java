@@ -1,5 +1,7 @@
 package ch.epfl.javions.adsb;
 
+import ch.epfl.javions.Preconditions;
+
 import java.util.regex.Pattern;
 
 /**
@@ -16,8 +18,9 @@ public record CallSign(String string) {
     /**
      * constructeur compact
      * @param string l'indicatif d'un aéronef
+     * @throws IllegalArgumentException si la chaine ne représente pas un'indicatif valide
      */
     public CallSign {
-        if (!sign.matcher(string).matches()) throw new IllegalArgumentException();
+        Preconditions.checkArgument(sign.matcher(string).matches());
     }
 }

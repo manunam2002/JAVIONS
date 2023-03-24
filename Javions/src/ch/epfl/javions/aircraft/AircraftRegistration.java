@@ -1,5 +1,7 @@
 package ch.epfl.javions.aircraft;
 
+import ch.epfl.javions.Preconditions;
+
 import java.util.regex.Pattern;
 
 /**
@@ -16,8 +18,9 @@ public record AircraftRegistration(String string) {
     /**
      * constructeur compact
      * @param string immatriculation
+     * @throws IllegalArgumentException si la chaine ne représente pas un'immatriculation valide
      */
     public AircraftRegistration {
-        if (!immatriculation.matcher(string).matches()) throw new IllegalArgumentException();
+        Preconditions.checkArgument(immatriculation.matcher(string).matches());
     }
 }

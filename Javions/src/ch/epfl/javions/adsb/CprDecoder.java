@@ -1,6 +1,7 @@
 package ch.epfl.javions.adsb;
 
 import ch.epfl.javions.GeoPos;
+import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.Units;
 
 /**
@@ -10,6 +11,11 @@ import ch.epfl.javions.Units;
  * @author Youssef Esseddik (346488)
  */
 public class CprDecoder {
+
+    /**
+     * constructeur privé
+     */
+    private CprDecoder(){}
 
     private static final int latZones0 = 60;
     private static final int latZones1 = 59;
@@ -31,7 +37,7 @@ public class CprDecoder {
      * @throws IllegalArgumentException si mostRecent ne vaut pas 0 ou 1
      */
     public static GeoPos decodePosition(double x0, double y0, double x1, double y1, int mostRecent){
-        if ((mostRecent != 0) && (mostRecent != 1)) throw new IllegalArgumentException();
+        Preconditions.checkArgument((mostRecent == 0) || (mostRecent == 1));
         int latZone = (int) Math.rint(y0*latZones1 - y1*latZones0);
         int latZone0;
         int latZone1;

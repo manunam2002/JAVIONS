@@ -2,6 +2,7 @@ package ch.epfl.javions.adsb;
 
 import ch.epfl.javions.ByteString;
 import ch.epfl.javions.Crc24;
+import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
 import java.util.HexFormat;
@@ -31,7 +32,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * ou si la chaîne d'octets ne contient pas LENGTH octets
      */
     public RawMessage{
-        if (timeStampNs < 0 || bytes.size() != LENGTH) throw new IllegalArgumentException();
+        Preconditions.checkArgument(timeStampNs >= 0 && bytes.size() == LENGTH);
     }
 
     /**

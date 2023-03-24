@@ -2,6 +2,7 @@ package ch.epfl.javions;
 
 import java.util.Arrays;
 import java.util.HexFormat;
+import java.util.Objects;
 
 /**
  * représente une chaîne d'octets
@@ -11,7 +12,7 @@ import java.util.HexFormat;
  */
 public final class ByteString {
 
-    private byte[] bytes;
+    private final byte[] bytes;
 
     /**
      * constructeur public
@@ -30,7 +31,7 @@ public final class ByteString {
      */
     public static ByteString ofHexadecimalString(String hexString){
         int l = hexString.length();
-        if (l%2 != 0) throw new IllegalArgumentException();
+        Preconditions.checkArgument(l%2 == 0);
         try {
             byte[] bytes1 = HexFormat.of().parseHex(hexString);
             return new ByteString(bytes1);
@@ -55,8 +56,7 @@ public final class ByteString {
      */
     public int byteAt(int index){
         if (index < 0 || index >= bytes.length) throw new IndexOutOfBoundsException();
-        int i = bytes[index] & 0x00_00_00_FF;
-        return i;
+        return bytes[index] & 0x00_00_00_FF;
     }
 
     /**
@@ -71,9 +71,9 @@ public final class ByteString {
      * au nombre d'octets contenus dans une valeur de type long
      */
     public long bytesInRange(int fromIndex, int toIndex){
-        if (fromIndex < 0 || fromIndex >= bytes.length) throw new IndexOutOfBoundsException();
-        if (toIndex < 0 || toIndex > bytes.length) throw new IndexOutOfBoundsException();
-        if (toIndex-fromIndex < 0 || toIndex-fromIndex >= 8) throw new IllegalArgumentException();
+        Objects.checkIndex(toIndex,bytes.length+1);
+        Objects.checkIndex(fromIndex,bytes.length);
+        Preconditions.checkArgument(!(toIndex-fromIndex < 0 || toIndex-fromIndex >= 8));
         long l = 0;
         for (int i = 0 ; i < toIndex-fromIndex ; ++i){
             long l1 = (long) byteAt(toIndex - i - 1) << 8*i;

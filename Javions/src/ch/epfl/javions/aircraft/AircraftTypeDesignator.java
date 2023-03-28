@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public record AircraftTypeDesignator(String string) {
 
-    private final static Pattern type = Pattern.compile("[A-Z0-9]{2,4}");
+    private final static Pattern TYPE_PATTERN = Pattern.compile("[A-Z0-9]{2,4}");
 
     /**
      * constructeur compact
@@ -21,6 +21,7 @@ public record AircraftTypeDesignator(String string) {
      * @throws IllegalArgumentException si la chaine n'est pas vide et ne représente pas un'indicateur de type valide
      */
     public AircraftTypeDesignator {
-        Preconditions.checkArgument(string.equals("") || string == null || type.matcher(string).matches());
+        Preconditions.checkArgument(string.equals("") || string == null
+                || TYPE_PATTERN.matcher(string).matches());
     }
 }

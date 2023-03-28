@@ -12,7 +12,6 @@ public final class Crc24 {
      * générateur utilisé pour calculer le CRC24 des messages ADS-B
      */
     public final static int GENERATOR = 0xFFF409;
-    private final int generator1;
     private final int[] table;
 
     /**
@@ -20,7 +19,6 @@ public final class Crc24 {
      * @param generator générateur
      */
     public Crc24(int generator){
-        this.generator1 = generator;
         this.table = buildTable(generator);
     }
 
@@ -67,15 +65,6 @@ public final class Crc24 {
             crc = crc ^ tab[n_1];
         }
         return Bits.extractUInt(crc,0,24);
-    }
-
-    /**
-     * appelle crc_bitwise avec le générateur pour calculer le CRC24 des messages ADS-B
-     * @param bytes le tableau donné
-     * @return le CRC24 correspondant
-     */
-    public int crc_basic(byte[] bytes){
-        return crc_bitwise(generator1,bytes);
     }
 
     /**

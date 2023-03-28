@@ -47,7 +47,7 @@ public record GeoPos(int longitudeT32, int latitudeT32) {
 
     @Override
     public String toString() {
-        return "("+Units.convertTo(longitude(),Units.Angle.DEGREE)+"°, " +
-                ""+Units.convertTo(latitude(),Units.Angle.DEGREE)+"°)";
+        return "(" + Units.convertTo(longitude(),Units.Angle.DEGREE) + "°, " +
+                "" + Units.convertTo(latitude(),Units.Angle.DEGREE) + "°)";
     }
 }

@@ -1,6 +1,7 @@
 package ch.epfl.javions.aircraft;
 
 import java.io.*;
+import java.util.Objects;
 import java.util.zip.ZipFile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -22,7 +23,7 @@ public final class AircraftDatabase {
      * @throws NullPointerException si le paramètre est nul
      */
     public AircraftDatabase(String fileName){
-        if (fileName == null) throw new NullPointerException();
+        Objects.requireNonNull(fileName);
         this.fileName = fileName;
     }
 
@@ -34,20 +35,20 @@ public final class AircraftDatabase {
      * @throws IOException en cas d'erreur d'entrée
      */
     public AircraftData get(IcaoAddress address) throws IOException {
-        String firstString = address.string().substring(4,6);
-        try     (ZipFile z = new ZipFile(fileName);
-                InputStream stream = z.getInputStream(z.getEntry(firstString+".csv"));
-                Reader reader = new InputStreamReader(stream, UTF_8);
-                BufferedReader buffer = new BufferedReader(reader)){
-            String line = "";
+        String firstString = address.string().substring(4, 6);
+        try (ZipFile z = new ZipFile(fileName);
+             InputStream stream = z.getInputStream(z.getEntry(firstString + ".csv"));
+             Reader reader = new InputStreamReader(stream, UTF_8);
+             BufferedReader buffer = new BufferedReader(reader)) {
+            String line = null;
             int comparator = 1;
-            while (comparator > 0 && (line = buffer.readLine()) != null){
-                if (line.startsWith(address.string())){
-                    comparator = address.string().compareTo(line.substring(0,6));
+            while (comparator > 0 && (line = buffer.readLine()) != null) {
+                if (line.startsWith(address.string())) {
+                    comparator = address.string().compareTo(line.substring(0, 6));
                 }
             }
             String[] aircraftData;
-            if (comparator == 0){
+            if (comparator == 0) {
                 String regex = ",";
                 aircraftData = line.split(regex, -1);
             } else {

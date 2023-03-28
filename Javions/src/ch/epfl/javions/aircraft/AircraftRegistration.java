@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public record AircraftRegistration(String string) {
 
-    private final static Pattern immatriculation = Pattern.compile("[A-Z0-9 .?/_+-]+");
+    private final static Pattern IMMATRICULATION_PATTERN = Pattern.compile("[A-Z0-9 .?/_+-]+");
 
     /**
      * constructeur compact
@@ -21,6 +21,6 @@ public record AircraftRegistration(String string) {
      * @throws IllegalArgumentException si la chaine ne représente pas un'immatriculation valide
      */
     public AircraftRegistration {
-        Preconditions.checkArgument(immatriculation.matcher(string).matches());
+        Preconditions.checkArgument(IMMATRICULATION_PATTERN.matcher(string).matches());
     }
 }

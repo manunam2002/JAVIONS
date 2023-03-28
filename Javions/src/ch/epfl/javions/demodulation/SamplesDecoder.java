@@ -4,6 +4,7 @@ import ch.epfl.javions.Preconditions;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 /**
  * représente un décodeur d'échantillons : un objet capable de transformer les octets
@@ -27,7 +28,7 @@ public final class SamplesDecoder {
      */
     public SamplesDecoder(InputStream stream, int batchSize) {
         Preconditions.checkArgument(!(batchSize <= 0));
-        if (stream == null) throw new NullPointerException();
+        Objects.requireNonNull(stream);
         this.stream = stream;
         this.batchSize = batchSize;
         batchBytes = new byte[batchSize*2];

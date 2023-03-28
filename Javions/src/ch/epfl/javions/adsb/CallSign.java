@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public record CallSign(String string) {
 
-    private final static Pattern sign = Pattern.compile("[A-Z0-9 ]{0,8}");
+    private final static Pattern CALLSIGN_PATTERN = Pattern.compile("[A-Z0-9 ]{0,8}");
 
     /**
      * constructeur compact
@@ -21,6 +21,6 @@ public record CallSign(String string) {
      * @throws IllegalArgumentException si la chaine ne représente pas un'indicatif valide
      */
     public CallSign {
-        Preconditions.checkArgument(sign.matcher(string).matches());
+        Preconditions.checkArgument(CALLSIGN_PATTERN.matcher(string).matches());
     }
 }

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public record IcaoAddress(String string) {
 
-    private final static Pattern oACI = Pattern.compile("[0-9A-F]{6}");
+    private final static Pattern ICAO_PATTERN = Pattern.compile("[0-9A-F]{6}");
 
     /**
      * constructeur compact
@@ -21,6 +21,6 @@ public record IcaoAddress(String string) {
      * @throws IllegalArgumentException si la chaine ne représente pas une adresse OACI valide
      */
     public IcaoAddress {
-        Preconditions.checkArgument(oACI.matcher(string).matches());
+        Preconditions.checkArgument(ICAO_PATTERN.matcher(string).matches());
     }
 }

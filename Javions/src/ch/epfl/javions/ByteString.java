@@ -30,11 +30,11 @@ public final class ByteString {
      * @throws NumberFormatException si elle contient un caractère qui n'est pas un chiffre hexadécimal
      */
     public static ByteString ofHexadecimalString(String hexString){
-        int l = hexString.length();
-        Preconditions.checkArgument(l%2 == 0);
+        int length = hexString.length();
+        Preconditions.checkArgument(length%2 == 0);
         try {
-            byte[] bytes1 = HexFormat.of().parseHex(hexString);
-            return new ByteString(bytes1);
+            byte[] bytesArray = HexFormat.of().parseHex(hexString);
+            return new ByteString(bytesArray);
         } catch (IllegalArgumentException e) {
             throw new NumberFormatException();
         }
@@ -55,8 +55,8 @@ public final class ByteString {
      * @throws IndexOutOfBoundsException si l'index est invalide
      */
     public int byteAt(int index){
-        if (index < 0 || index >= bytes.length) throw new IndexOutOfBoundsException();
-        return bytes[index] & 0x00_00_00_FF;
+        Objects.checkIndex(index,bytes.length);
+        return bytes[index] & 0xFF;
     }
 
     /**
@@ -73,13 +73,13 @@ public final class ByteString {
     public long bytesInRange(int fromIndex, int toIndex){
         Objects.checkIndex(toIndex,bytes.length+1);
         Objects.checkIndex(fromIndex,bytes.length);
-        Preconditions.checkArgument(!(toIndex-fromIndex < 0 || toIndex-fromIndex >= 8));
-        long l = 0;
+        Preconditions.checkArgument(toIndex-fromIndex >= 0 && toIndex-fromIndex < 8);
+        long value = 0;
         for (int i = 0 ; i < toIndex-fromIndex ; ++i){
-            long l1 = (long) byteAt(toIndex - i - 1) << 8*i;
-            l = l | l1;
+            long l = (long) byteAt(toIndex - i - 1) << 8*i;
+            value = value | l;
         }
-        return l;
+        return value;
     }
 
     @Override

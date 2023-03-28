@@ -27,11 +27,11 @@ public final class Bits {
      * entre 0 (inclus) et 64 (exclu)
      */
     public static int extractUInt(long value, int start, int size){
-        Preconditions.checkArgument(!(size <= 0 || size >= Integer.SIZE));
+        Preconditions.checkArgument(size > 0 && size < Integer.SIZE);
         Objects.checkFromIndexSize(start, size, Long.SIZE);
-        long l = value << Long.SIZE-(size+start);
-        long l1 = l >>> Long.SIZE - size;
-        return (int) l1;
+        long l = value << Long.SIZE - (size + start);
+        long newValue = l >>> Long.SIZE - size;
+        return (int) newValue;
     }
 
     /**
@@ -43,8 +43,8 @@ public final class Bits {
      */
     public static boolean testBit(long value, int index){
         Objects.checkIndex(index,Long.SIZE);
-        long l = value << Long.SIZE - (index+1);
-        long l1 = l >>> Long.SIZE - 1;
-        return l1 == 1;
+        long l = value << Long.SIZE - (index + 1);
+        long testedBit = l >>> Long.SIZE - 1;
+        return testedBit == 1;
     }
 }

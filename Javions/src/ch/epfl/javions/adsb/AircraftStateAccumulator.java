@@ -1,5 +1,7 @@
 package ch.epfl.javions.adsb;
 
+import java.util.Objects;
+
 /**
  * représente un objet accumulant les messages ADS-B provenant d'un seul aéronef
  * afin de déterminer son état au cours du temps
@@ -22,7 +24,7 @@ public class AircraftStateAccumulator <T extends AircraftStateSetter> {
      * @throws NullPointerException si l'état modifiable donné est nul
      */
     public AircraftStateAccumulator(T stateSetter){
-        if (stateSetter == null) throw new NullPointerException();
+        Objects.requireNonNull(stateSetter);
         this.stateSetter = stateSetter;
     }
 

@@ -3,6 +3,8 @@ package ch.epfl.javions.adsb;
 import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
+import java.util.Objects;
+
 /**
  * représente un message ADS-B d'identification et de catégorie
  * @param timeStampNs l'horodatage du message, en nanosecondes
@@ -26,7 +28,8 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      * @throws IllegalArgumentException si timeStampNs est strictement inférieure à 0
      */
     public AircraftIdentificationMessage{
-        if (icaoAddress == null || callSign == null) throw new NullPointerException();
+        Objects.requireNonNull(icaoAddress);
+        Objects.requireNonNull(callSign);
         Preconditions.checkArgument(timeStampNs >= 0);
     }
 

@@ -4,6 +4,8 @@ import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.Units;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
+import java.util.Objects;
+
 /**
  * représente un message de vitesse en vol
  * @param timeStampNs l'horodatage du message, en nanosecondes
@@ -27,7 +29,7 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
      * @throws IllegalArgumentException si timeStampNs, speed ou trackOrHeading sont strictement négatifs
      */
     public AirborneVelocityMessage{
-        if (icaoAddress == null) throw new NullPointerException();
+        Objects.requireNonNull(icaoAddress);
         Preconditions.checkArgument(timeStampNs >= 0 && speed >= 0 && trackOrHeading >= 0);
     }
 
@@ -63,12 +65,12 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             int AS = (int) (NUC & 0b1111111111);
             int HDG = (int) ((NUC >>> 11) & 0b1111111111);
             int SH = (int) ((NUC >>> 21) & 0b1);
-            if (SH == 0) return null;
+            if (SH == 0 || AS == 0) return null;
             double angle = Units.convertFrom(Math.scalb(HDG,-10),Units.Angle.TURN);
             if (subType == 3) return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
-                    Units.convert(AS,Units.Speed.KNOT,Units.Speed.METER_PER_SECOND), angle);
+                    Units.convert(AS-1,Units.Speed.KNOT,Units.Speed.METER_PER_SECOND), angle);
             return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
-                    Units.convert(AS*4,Units.Speed.KNOT,Units.Speed.METER_PER_SECOND), angle);
+                    Units.convert((AS-1)*4,Units.Speed.KNOT,Units.Speed.METER_PER_SECOND), angle);
         }
         return null;
     }

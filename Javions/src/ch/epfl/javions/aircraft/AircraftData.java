@@ -23,6 +23,7 @@ public record AircraftData(AircraftRegistration registration, AircraftTypeDesign
      * @param model modèle de l'aéronef
      * @param description description de l'aéronef
      * @param wakeTurbulenceCategory catégorie de turbulence de sillage d'un aéronef
+     * @throws NullPointerException si l'un de ses arguments est null
      */
     public AircraftData{
         Objects.requireNonNull(registration);

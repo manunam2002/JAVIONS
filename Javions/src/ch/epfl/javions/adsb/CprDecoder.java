@@ -20,10 +20,6 @@ public class CprDecoder {
     private static final int latZones0 = 60;
     private static final int latZones1 = 59;
 
-    //private static final double minLat = Units.convert(0,Units.Angle.DEGREE,Units.Angle.TURN);
-
-    //private static final double maxLat = Units.convert(180,Units.Angle.DEGREE,Units.Angle.TURN);
-
     private static final double lonZonesCalculator = 1 - Math.cos(2 * Math.PI * (1.0/latZones0));
 
     /**

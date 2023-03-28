@@ -5,6 +5,8 @@ import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.Units;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
+import java.util.Objects;
+
 /**
  * représente un message ADS-B de positionnement en vol
  * @param timeStampNs l'horodatage du message, en nanosecondes
@@ -39,7 +41,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
      *          ou parity est différent de 0 ou 1, ou x ou y ne sont pas compris entre 0 (inclus) et 1 (exclu)
      */
     public AirbornePositionMessage{
-        if (icaoAddress == null) throw new NullPointerException();
+        Objects.requireNonNull(icaoAddress);
         Preconditions.checkArgument(timeStampNs >= 0 && (parity == 0 || parity == 1) &&
                 (x >= 0 && x < 1) && (y >= 0 && y < 1));
     }

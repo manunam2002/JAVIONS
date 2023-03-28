@@ -17,7 +17,6 @@ public final class PrintAircraftStateAccumulation {
             AircraftStateAccumulator<AircraftState> a = new AircraftStateAccumulator<>(new AircraftState());
             while ((m = d.nextMessage()) != null){
                 if (!m.icaoAddress().equals(expectedAddress)) continue;
-
                 Message pm = MessageParser.parse(m);
                 if (pm != null) a.update(pm);
             }

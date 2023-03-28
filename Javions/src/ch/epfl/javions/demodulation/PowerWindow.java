@@ -5,6 +5,7 @@ import ch.epfl.javions.Preconditions;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * représente une fenêtre de taille fixe sur une séquence d'échantillons de puissance
@@ -73,7 +74,7 @@ public final class PowerWindow {
      * et la taille de la fenêtre (exclu)
      */
     public int get(int i){
-        if (i < 0 || i >= windowSize) throw new IndexOutOfBoundsException();
+        Objects.checkIndex(i,windowSize);
         int index = position+i-currentBatch*batchSize;
         if (index >= batchSize){
             return Batch2[index-batchSize];

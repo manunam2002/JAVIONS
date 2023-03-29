@@ -1,5 +1,6 @@
 package ch.epfl.javions.adsb;
 
+import ch.epfl.javions.ByteString;
 import ch.epfl.javions.Crc24;
 import ch.epfl.javions.aircraft.IcaoAddress;
 import org.junit.jupiter.api.Test;
@@ -143,5 +144,12 @@ class AirbornePositionMessageTest {
             var airbornePositionMessage = AirbornePositionMessage.of(message);
             assertNull(airbornePositionMessage);
         }
+    }
+
+    @Test
+    void getterisAutomatic(){
+        AirbornePositionMessage airbornePositionMessage = AirbornePositionMessage.of(new RawMessage(0, ByteString.ofHexadecimalString("8D406666580D1652395CBE0A4D3E")));
+        System.out.println(airbornePositionMessage.altitude());
+
     }
 }

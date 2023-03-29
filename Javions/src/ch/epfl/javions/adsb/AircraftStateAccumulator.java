@@ -42,35 +42,39 @@ public class AircraftStateAccumulator <T extends AircraftStateSetter> {
      */
     public void update(Message message){
         switch (message){
+
             case AircraftIdentificationMessage aim -> {
                 stateSetter.setLastMessageTimeStampNs(aim.timeStampNs());
                 stateSetter.setCategory(aim.category());
                 stateSetter.setCallSign(aim.callSign());
             }
-            case AirbornePositionMessage aim -> {
-                stateSetter.setLastMessageTimeStampNs(aim.timeStampNs());
-                stateSetter.setAltitude(aim.altitude());
-                if (aim.parity() == 1) {
-                    lastPositionMessage1 = aim;
+
+            case AirbornePositionMessage apm -> {
+                stateSetter.setLastMessageTimeStampNs(apm.timeStampNs());
+                stateSetter.setAltitude(apm.altitude());
+                if (apm.parity() == 1) {
+                    lastPositionMessage1 = apm;
                     if ((lastPositionMessage0 != null) &&
-                            (aim.timeStampNs() - lastPositionMessage0.timeStampNs() <= 10E9)) {
+                            (apm.timeStampNs() - lastPositionMessage0.timeStampNs() <= 10E9)) {
                         stateSetter.setPosition(CprDecoder.decodePosition(lastPositionMessage0.x(),
-                                lastPositionMessage0.y(), aim.x(), aim.y(), 1));
+                                lastPositionMessage0.y(), apm.x(), apm.y(), 1));
                     }
                 } else {
-                    lastPositionMessage0 = aim;
+                    lastPositionMessage0 = apm;
                     if ((lastPositionMessage1 != null) &&
-                            (aim.timeStampNs() - lastPositionMessage1.timeStampNs() <= 10E9)) {
-                        stateSetter.setPosition(CprDecoder.decodePosition(aim.x(),
-                                aim.y(), lastPositionMessage1.x(), lastPositionMessage1.y(), 0));
+                            (apm.timeStampNs() - lastPositionMessage1.timeStampNs() <= 10E9)) {
+                        stateSetter.setPosition(CprDecoder.decodePosition(apm.x(),
+                                apm.y(), lastPositionMessage1.x(), lastPositionMessage1.y(), 0));
                     }
                 }
             }
-            case AirborneVelocityMessage aim -> {
-                stateSetter.setLastMessageTimeStampNs(aim.timeStampNs());
-                stateSetter.setVelocity(aim.speed());
-                stateSetter.setTrackOrHeading(aim.trackOrHeading());
+
+            case AirborneVelocityMessage avm -> {
+                stateSetter.setLastMessageTimeStampNs(avm.timeStampNs());
+                stateSetter.setVelocity(avm.speed());
+                stateSetter.setTrackOrHeading(avm.trackOrHeading());
             }
+
             default -> {}
         }
     }

@@ -41,12 +41,13 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      */
     public static AircraftIdentificationMessage of(RawMessage rawMessage){
         int category1 = (rawMessage.bytes().byteAt(4)) & 0x7;
-        int category2 = ((14-rawMessage.typeCode())&0b1111)<<4;
+        int category2 = ((14 - rawMessage.typeCode()) & 0xF) << 4;
         category1 = category2 | category1;
         StringBuilder callSign1 = new StringBuilder();
         long callSignValue = rawMessage.bytes().bytesInRange(5,11);
+
         for (int i = 0 ; i < 8 ; ++i){
-            int c = (int) ((callSignValue >>> ((7-i)*6)) & 0x3F);
+            int c = (int) ((callSignValue >>> ((7 - i) * 6)) & 0x3F);
             char c1;
             if (c > 0 && c < 27){
                 c1 = (char)(c +64);
@@ -71,21 +72,5 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
     @Override
     public IcaoAddress icaoAddress() {
         return icaoAddress;
-    }
-
-    /**
-     * retourne l'indicatif de l'expéditeur du message
-     * @return l'indicatif de l'expéditeur du message
-     */
-    public CallSign callSign() {
-        return callSign;
-    }
-
-    /**
-     * retourne la catégorie de l'expéditeur du message
-     * @return la catégorie de l'expéditeur du message
-     */
-    public int category() {
-        return category;
     }
 }

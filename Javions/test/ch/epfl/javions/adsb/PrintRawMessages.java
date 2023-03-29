@@ -25,12 +25,12 @@ public final class PrintRawMessages {
                 }
                 if ((m.typeCode() > 8 && m.typeCode() < 19)||(m.typeCode() > 19 && m.typeCode() < 23)){
                     AirbornePositionMessage m2 = AirbornePositionMessage.of(m);
-                    System.out.println(m);
+                    //System.out.println(m);
                     ++count2;
                 }
                 if ((m.typeCode() == 19)){
                     AirborneVelocityMessage m3 = AirborneVelocityMessage.of(m);
-                    //System.out.println(m3);
+                    System.out.println(m3);
                     ++count3;
                 }
             }

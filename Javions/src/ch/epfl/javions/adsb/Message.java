@@ -21,5 +21,4 @@ public interface Message {
      * @return l'adresse OACI de l'expéditeur du message
      */
     IcaoAddress icaoAddress();
-
 }

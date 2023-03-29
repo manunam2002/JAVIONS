@@ -95,40 +95,4 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
     public IcaoAddress icaoAddress() {
         return icaoAddress;
     }
-
-    /**
-     * retourne l'altitude à laquelle se trouvait l'aéronef au moment de l'envoi du message, en mètres
-     * @return l'altitude à laquelle se trouvait l'aéronef au moment de l'envoi du message, en mètres
-     */
-    public double altitude() {
-        return altitude;
-    }
-
-    /**
-     * retourne la parité du message (0 s'il est pair, 1 s'il est impair)
-     * @return la parité du message (0 s'il est pair, 1 s'il est impair)
-     */
-    public int parity() {
-        return parity;
-    }
-
-    /**
-     * retourne la longitude locale et normalisée, donc comprise entre 0 et 1,
-     * à laquelle se trouvait l'aéronef au moment de l'envoi du message
-     * @return la longitude locale et normalisée, donc comprise entre 0 et 1,
-     * à laquelle se trouvait l'aéronef au moment de l'envoi du message
-     */
-    public double x() {
-        return x;
-    }
-
-    /**
-     * retourne la latitude locale et normalisée, donc comprise entre 0 et 1,
-     * à laquelle se trouvait l'aéronef au moment de l'envoi du message
-     * @return la latitude locale et normalisée, donc comprise entre 0 et 1,
-     * à laquelle se trouvait l'aéronef au moment de l'envoi du message
-     */
-    public double y() {
-        return y;
-    }
 }

@@ -21,7 +21,6 @@ public record AircraftTypeDesignator(String string) {
      * @throws IllegalArgumentException si la chaine n'est pas vide et ne représente pas un'indicateur de type valide
      */
     public AircraftTypeDesignator {
-        Preconditions.checkArgument(string.equals("") || string == null
-                || TYPE_PATTERN.matcher(string).matches());
+        Preconditions.checkArgument(string.equals("") || TYPE_PATTERN.matcher(string).matches());
     }
 }

@@ -22,7 +22,7 @@ public final class PowerWindow {
     private final int[] Batch2;
     private int position = 0;
     private int currentBatch = 0;
-    private final int batchSize = 65536;
+    private final static int BATCH_SIZE = 65536;
     private int batchRead = 0;
 
     /**
@@ -34,11 +34,11 @@ public final class PowerWindow {
      * et 65536 (la taille d'un lot)
      */
     public PowerWindow(InputStream stream, int windowSize) throws IOException{
-        Preconditions.checkArgument(windowSize > 0 && windowSize <= batchSize);
+        Preconditions.checkArgument(windowSize > 0 && windowSize <= BATCH_SIZE);
         this.windowSize = windowSize;
-        powerComputer = new PowerComputer(stream,batchSize);
-        Batch1 = new int[batchSize];
-        Batch2 = new int[batchSize];
+        powerComputer = new PowerComputer(stream, BATCH_SIZE);
+        Batch1 = new int[BATCH_SIZE];
+        Batch2 = new int[BATCH_SIZE];
         batchRead += powerComputer.readBatch(Batch1);
     }
 
@@ -75,9 +75,9 @@ public final class PowerWindow {
      */
     public int get(int i){
         Objects.checkIndex(i,windowSize);
-        int index = position+i-currentBatch*batchSize;
-        if (index >= batchSize){
-            return Batch2[index-batchSize];
+        int index = position + i - currentBatch*BATCH_SIZE;
+        if (index >= BATCH_SIZE){
+            return Batch2[index - BATCH_SIZE];
         }
         return Batch1[index];
     }
@@ -88,11 +88,11 @@ public final class PowerWindow {
      */
     public void advance() throws IOException{
         ++position;
-        if (position+windowSize == batchSize*(currentBatch+1)){
+        if (position + windowSize == BATCH_SIZE * (currentBatch + 1)){
             batchRead += powerComputer.readBatch(Batch2);
         }
-        if (position == batchSize*(currentBatch+1)){
-            Batch1 = Arrays.copyOf(Batch2,batchSize);
+        if (position == BATCH_SIZE * (currentBatch + 1)){
+            Batch1 = Arrays.copyOf(Batch2, BATCH_SIZE);
             ++currentBatch;
         }
     }
@@ -101,9 +101,10 @@ public final class PowerWindow {
      * avance la fenêtre du nombre d'échantillons donné
      * @param offset le nombre d'échantillons donné
      * @throws IOException en cas d'erreur d'entrée
+     * @throws IllegalArgumentException si l'offset est négatif
      */
     public void advanceBy(int offset) throws IOException{
-        if (offset < 0) throw new IllegalArgumentException();
+        Preconditions.checkArgument(offset >= 0);
         for(int i = 0 ; i < offset ; ++i){
             advance();
         }

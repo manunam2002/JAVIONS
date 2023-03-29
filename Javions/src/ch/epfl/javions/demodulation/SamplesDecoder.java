@@ -27,7 +27,7 @@ public final class SamplesDecoder {
      * @throws NullPointerException si le flot est nul
      */
     public SamplesDecoder(InputStream stream, int batchSize) {
-        Preconditions.checkArgument(!(batchSize <= 0));
+        Preconditions.checkArgument(batchSize > 0);
         Objects.requireNonNull(stream);
         this.stream = stream;
         this.batchSize = batchSize;

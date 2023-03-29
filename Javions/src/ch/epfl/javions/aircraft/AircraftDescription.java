@@ -21,7 +21,6 @@ public record AircraftDescription(String string) {
      * @throws IllegalArgumentException si la chaine n'est pas vide et ne représente pas une description valide
      */
     public AircraftDescription {
-        Preconditions.checkArgument(string.equals("") || string == null
-                || DESCRIPTION_PATTERN.matcher(string).matches());
+        Preconditions.checkArgument(string.equals("") || DESCRIPTION_PATTERN.matcher(string).matches());
     }
 }

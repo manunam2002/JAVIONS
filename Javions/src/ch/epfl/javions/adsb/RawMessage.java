@@ -22,7 +22,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      */
     public static final int LENGTH = 14;
 
-    private final static Crc24 crc24 = new Crc24(Crc24.GENERATOR);
+    private final static Crc24 CRC_24 = new Crc24(Crc24.GENERATOR);
 
     /**
      * constructeur compact
@@ -43,7 +43,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return le message ADS-B brut
      */
     public static RawMessage of(long timeStampNs, byte[] bytes){
-        if (crc24.crc(bytes) != 0) return null;
+        if (CRC_24.crc(bytes) != 0) return null;
         return new RawMessage(timeStampNs, new ByteString(bytes));
     }
 
@@ -53,7 +53,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return la taille d'un message
      */
     public static int size(byte byte0){
-        if (((byte0>>>3)&0b11111) == 17) return LENGTH;
+        if (( (byte0 >>> 3) & 0x1F) == 17) return LENGTH;
         return 0;
     }
 
@@ -63,7 +63,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return le code de type
      */
     public static int typeCode(long payload){
-        long typeCode = (payload >>> 51) & 0b11111;
+        long typeCode = (payload >>> 51) & 0x1F;
         return (int) typeCode;
     }
 
@@ -72,7 +72,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return le format du message
      */
     public int downLinkFormat(){
-        return (bytes.byteAt(0)>>>3);
+        return (bytes.byteAt(0) >>> 3);
     }
 
     /**

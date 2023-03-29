@@ -46,7 +46,7 @@ public final class PowerComputer {
         for(int i = 0 ; i < decodedSamples ; ++i){
             int index = i%8;
             lastSamples[index] = batchDecoded[i];
-            if ((i+1)%2 == 0) batch[(i-1)/2] = powerCalculator(index,lastSamples);
+            if ((i + 1) % 2 == 0) batch[(i - 1) / 2] = powerCalculator(index,lastSamples);
         }
         return decodedSamples/2;
     }
@@ -62,10 +62,10 @@ public final class PowerComputer {
         for (int i = 0 ; i < 8 ; i++){
             calculatedIndex[i] = indexCalculator(index,i);
         }
-        int evenSamples = lastSamples[calculatedIndex[6]]-lastSamples[calculatedIndex[4]]+
-                lastSamples[calculatedIndex[2]]-lastSamples[calculatedIndex[0]];
-        int oddSamples = lastSamples[calculatedIndex[7]]-lastSamples[calculatedIndex[5]]+
-                lastSamples[calculatedIndex[3]]-lastSamples[calculatedIndex[1]];
+        int evenSamples = lastSamples[calculatedIndex[6]] - lastSamples[calculatedIndex[4]]
+                + lastSamples[calculatedIndex[2]] - lastSamples[calculatedIndex[0]];
+        int oddSamples = lastSamples[calculatedIndex[7]] - lastSamples[calculatedIndex[5]]
+                + lastSamples[calculatedIndex[3]] - lastSamples[calculatedIndex[1]];
         return evenSamples*evenSamples + oddSamples*oddSamples;
     }
 
@@ -76,7 +76,7 @@ public final class PowerComputer {
      * @return le bon index
      */
     private int indexCalculator(int index, int j){
-        int indexJ = index-j;
+        int indexJ = index - j;
         if (indexJ < 0) indexJ += 8;
         return indexJ;
     }

@@ -29,5 +29,4 @@ public class AircraftStateAccumulatorTest {
         aircraftStateAccumulator.update(message);
         aircraftStateAccumulator.update(message1);
     }
-
 }

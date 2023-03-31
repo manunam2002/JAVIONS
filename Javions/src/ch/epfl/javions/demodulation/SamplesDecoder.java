@@ -47,7 +47,7 @@ public final class SamplesDecoder {
         int bytesRead = stream.readNBytes(batchBytes, 0, batchSize*2);
         for (int i = 0 ; i < batchSize ; ++i){
             batch[i] = (short) (0xFF & batchBytes[2*i]);
-            batch[i] = (short) (batch[i] | batchBytes[2*i+1] << 8);
+            batch[i] = (short) (batch[i] | batchBytes[2*i + 1] << 8);
             batch[i] -= 2048;
         }
         return bytesRead/2;

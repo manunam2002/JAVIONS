@@ -38,12 +38,19 @@ public class AirborneVelocityMessageTest {
     void AirborneVelocityMessageWorksWithBookExamples(){
         RawMessage rawMessage = new RawMessage(0,ByteString.ofHexadecimalString("8D485020994409940838175B284F"));
         RawMessage rawMessage1 = new RawMessage(0,ByteString.ofHexadecimalString("8DA05F219B06B6AF189400CBC33F"));
+        RawMessage rawMessage2 = new RawMessage(0, ByteString.ofHexadecimalString("8DA05F219C06B6AF189400CBC33F"));
+        RawMessage rawMessage3 = new RawMessage(0,ByteString.ofHexadecimalString("8D4B1A00EA0DC89E8F7C0857D5F5"));
         AirborneVelocityMessage airborneVelocityMessage = AirborneVelocityMessage.of(rawMessage);
         AirborneVelocityMessage airborneVelocityMessage1 = AirborneVelocityMessage.of(rawMessage1);
+        AirborneVelocityMessage airborneVelocityMessage2 = AirborneVelocityMessage.of(rawMessage2);
+        AirborneVelocityMessage airborneVelocityMessage3 = AirborneVelocityMessage.of(rawMessage3);
 
         assertEquals(159.20, Units.convert(airborneVelocityMessage.speed(),Units.Speed.METER_PER_SECOND,Units.Speed.KNOT),0.01);
         assertEquals(182.88,Units.convertTo(airborneVelocityMessage.trackOrHeading(),Units.Angle.DEGREE),0.01);
         assertEquals(375,Units.convert(airborneVelocityMessage1.speed(),Units.Speed.METER_PER_SECOND,Units.Speed.KNOT));
         assertEquals(243.98,Units.convertTo(airborneVelocityMessage1.trackOrHeading(),Units.Angle.DEGREE),0.01);
+        assertEquals(4*192.91666666666669,airborneVelocityMessage2.speed());
+        assertEquals(1061.4503686262444,airborneVelocityMessage3.speed());
+        assertEquals(4.221861463749146,airborneVelocityMessage3.trackOrHeading());
     }
 }

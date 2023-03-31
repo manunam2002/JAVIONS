@@ -58,6 +58,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         int LAT_CPR = (int) ((me >>> 17) & 0x1FFFF);
         int FORMAT = (int) ((me >>> 34) & 0x1);
         int ALT = (int) ((me >>> 36) & 0xFFF);
+
         double altitude;
         if (Bits.testBit(ALT,4)){
             int alt = ((Bits.extractUInt(ALT,0,4)) | ((Bits.extractUInt(ALT,5,7))<<4));
@@ -65,21 +66,21 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         } else {
             int orderedALT = 0;
             for (int i = 0 ; i < 12 ; ++i){
-                if (Bits.testBit(ALT,i)) orderedALT = (orderedALT | (1 << index[i]))&0xFFF;
+                if (Bits.testBit(ALT,i)) orderedALT = (orderedALT | (1 << index[i])) & 0xFFF;
             }
             int f100Gray = Bits.extractUInt(orderedALT,0,3);
             int f500Gray = Bits.extractUInt(orderedALT,3,9);
             int f100Decoded = f100Gray;
             int f500Decoded = f500Gray;
             for (byte i = 1 ; i < 3 ; ++ i){
-                f100Decoded = f100Decoded^(f100Gray>>i);
+                f100Decoded = f100Decoded ^ (f100Gray>>i);
             }
             for (byte i = 1 ; i < 9 ; ++i){
-                f500Decoded = f500Decoded^(f500Gray>>i);
+                f500Decoded = f500Decoded ^ (f500Gray>>i);
             }
-            if ((f100Decoded == 0)||(f100Decoded == 5)||(f100Decoded == 6)) return null;
+            if ((f100Decoded == 0) || (f100Decoded == 5) || (f100Decoded == 6)) return null;
             if (f100Decoded == 7) f100Decoded = 5;
-            if (f500Decoded%2 != 0) f100Decoded = 6-f100Decoded;
+            if (f500Decoded%2 != 0) f100Decoded = 6 - f100Decoded;
             altitude = Units.convertFrom((-1300 + f100Decoded*100 + f500Decoded*500),Units.Length.FOOT);
         }
         return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),

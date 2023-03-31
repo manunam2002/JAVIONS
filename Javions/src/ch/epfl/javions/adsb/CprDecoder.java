@@ -3,7 +3,6 @@ package ch.epfl.javions.adsb;
 import ch.epfl.javions.GeoPos;
 import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.Units;
-import ch.epfl.javions.demodulation.AdsbDemodulator;
 
 /**
  * représente un décodeur de position CPR
@@ -39,8 +38,8 @@ public class CprDecoder {
         int latZoneNum0;
         int latZoneNum1;
         if (latZoneNum < 0){
-            latZoneNum0 = latZoneNum+ LAT_ZONES_0;
-            latZoneNum1 = latZoneNum+ LAT_ZONES_1;
+            latZoneNum0 = latZoneNum + LAT_ZONES_0;
+            latZoneNum1 = latZoneNum + LAT_ZONES_1;
         } else {
             latZoneNum0 = latZoneNum;
             latZoneNum1 = latZoneNum;
@@ -49,6 +48,7 @@ public class CprDecoder {
         double lat1 = (1.0/ LAT_ZONES_1) * (latZoneNum1 + y1);
         double lat0Rad = Units.convertFrom(lat0,Units.Angle.TURN);
         double lat1Rad = Units.convertFrom(lat1,Units.Angle.TURN);
+
         double a0 = Math.acos(1 - (LON_ZONES_CALCULATOR / (Math.cos(lat0Rad) * Math.cos(lat0Rad))));
         double a1 = Math.acos(1 - (LON_ZONES_CALCULATOR / (Math.cos(lat1Rad) * Math.cos(lat1Rad))));
         double lon0;
@@ -65,8 +65,8 @@ public class CprDecoder {
             int lonZoneNum0;
             int lonZoneNum1;
             if (lonZoneNum < 0){
-                lonZoneNum0 = lonZoneNum+lonZones0;
-                lonZoneNum1 = lonZoneNum+lonZones1;
+                lonZoneNum0 = lonZoneNum + lonZones0;
+                lonZoneNum1 = lonZoneNum + lonZones1;
             } else {
                 lonZoneNum0 = lonZoneNum;
                 lonZoneNum1 = lonZoneNum;

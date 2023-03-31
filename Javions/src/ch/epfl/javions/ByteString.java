@@ -85,7 +85,7 @@ public final class ByteString {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ByteString){
-            if (((ByteString) obj).size() == this.size()){
+            if (( (ByteString) obj).size() == this.size()){
                 return Arrays.equals(this.bytes, ((ByteString) obj).bytes);
             }
         }

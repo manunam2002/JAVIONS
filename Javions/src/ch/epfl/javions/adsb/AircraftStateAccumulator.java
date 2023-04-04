@@ -1,5 +1,7 @@
 package ch.epfl.javions.adsb;
 
+import ch.epfl.javions.GeoPos;
+
 import java.util.Objects;
 
 /**
@@ -56,15 +58,17 @@ public class AircraftStateAccumulator <T extends AircraftStateSetter> {
                     lastPositionMessage1 = apm;
                     if ((lastPositionMessage0 != null) &&
                             (apm.timeStampNs() - lastPositionMessage0.timeStampNs() <= 10E9)) {
-                        stateSetter.setPosition(CprDecoder.decodePosition(lastPositionMessage0.x(),
-                                lastPositionMessage0.y(), apm.x(), apm.y(), 1));
+                        GeoPos position = CprDecoder.decodePosition(lastPositionMessage0.x(),
+                                lastPositionMessage0.y(), apm.x(), apm.y(), 1);
+                        if (position != null) stateSetter.setPosition(position);
                     }
                 } else {
                     lastPositionMessage0 = apm;
                     if ((lastPositionMessage1 != null) &&
                             (apm.timeStampNs() - lastPositionMessage1.timeStampNs() <= 10E9)) {
-                        stateSetter.setPosition(CprDecoder.decodePosition(apm.x(),
-                                apm.y(), lastPositionMessage1.x(), lastPositionMessage1.y(), 0));
+                        GeoPos position = CprDecoder.decodePosition(apm.x(),
+                                apm.y(), lastPositionMessage1.x(), lastPositionMessage1.y(), 0);
+                        if (position != null) stateSetter.setPosition(position);
                     }
                 }
             }

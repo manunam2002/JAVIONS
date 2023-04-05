@@ -19,6 +19,10 @@ import java.util.Objects;
 public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress, double speed, double trackOrHeading)
         implements Message{
 
+    public static final int VELOCITY_MASK = 0x3FF;
+
+    public static final int NUC_MASK = 0x3FFFFF;
+
     /**
      * constructeur compact
      * @param timeStampNs l'horodatage du message, en nanosecondes
@@ -43,10 +47,10 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
         int subType = (rawMessage.bytes().byteAt(4) & 0x7);
 
         if (subType == 1 || subType == 2){
-            long NUC = (rawMessage.bytes().bytesInRange(5,9)>>>5)&0x3FFFFF;
-            int Vns = (int) (NUC & 0x3FF);
+            long NUC = (rawMessage.bytes().bytesInRange(5,9) >>> 5) & NUC_MASK;
+            int Vns = (int) (NUC & VELOCITY_MASK);
             int Dns = (int) ((NUC >>> 10) & 0x1);
-            int Vew = (int) ((NUC >>> 11) & 0x3FF);
+            int Vew = (int) ((NUC >>> 11) & VELOCITY_MASK);
             int Dew = (int) ((NUC >>> 21) & 0x1);
             if (Vns == 0 || Vew == 0) return null;
             --Vns;
@@ -62,9 +66,9 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
         }
 
         if (subType == 3 || subType == 4){
-            long NUC = (rawMessage.bytes().bytesInRange(5,9) >>> 5) & 0x3FFFFF;
-            int AS = (int) (NUC & 0x3FF);
-            int HDG = (int) ((NUC >>> 11) & 0x3FF);
+            long NUC = (rawMessage.bytes().bytesInRange(5,9) >>> 5) & NUC_MASK;
+            int AS = (int) (NUC & VELOCITY_MASK);
+            int HDG = (int) ((NUC >>> 11) & VELOCITY_MASK);
             int SH = (int) ((NUC >>> 21) & 0x1);
             if (SH == 0 || AS == 0) return null;
             double angle = Units.convertFrom(Math.scalb(HDG,-10),Units.Angle.TURN);

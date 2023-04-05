@@ -46,11 +46,11 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
         long callSignValue = rawMessage.bytes().bytesInRange(5,11);
         StringBuilder callSign1 = new StringBuilder();
 
-        for (int i = 0 ; i < 8 ; ++i){
+        for (int i = 0 ; i < Byte.SIZE ; ++i){
             int c = (int) ((callSignValue >>> ((7 - i) * 6)) & 0x3F);
             char c1;
             if (c > 0 && c < 27){
-                c1 = (char)(c +64);
+                c1 = (char)(c + 64);
             } else {
                 if ((c > 47 && c < 58)||(c == 32)){
                     c1 = (char)c;

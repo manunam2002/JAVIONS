@@ -18,6 +18,7 @@ public class CprDecoder {
     private CprDecoder(){}
 
     private static final int LAT_ZONES_0 = 60;
+
     private static final int LAT_ZONES_1 = 59;
 
     private static final double LON_ZONES_CALCULATOR = 1 - Math.cos(2 * Math.PI * (1.0/ LAT_ZONES_0));

@@ -16,7 +16,9 @@ import java.util.Objects;
 public final class SamplesDecoder {
 
     private final InputStream stream;
+
     private final int batchSize;
+
     private final byte[] batchBytes;
 
     /**

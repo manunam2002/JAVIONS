@@ -26,7 +26,12 @@ public final class Units {
     /**
      * contient les définitions des unités d'angle
      */
-    public static class Angle{
+    public final static class Angle{
+
+        /**
+         * constructeur privé
+         */
+        private Angle(){}
 
         /**
          * radian
@@ -52,7 +57,12 @@ public final class Units {
     /**
      * contient les définitions des unités de longueur
      */
-    public static class Length {
+    public final static class Length {
+
+        /**
+         * constructeur privé
+         */
+        private Length(){}
 
         /**
          * mètre
@@ -88,7 +98,12 @@ public final class Units {
     /**
      * contient les définitions des unités de temps
      */
-    public static class Time{
+    public final static class Time{
+
+        /**
+         * constructeur privé
+         */
+        private Time(){}
 
         /**
          * seconde
@@ -109,7 +124,12 @@ public final class Units {
     /**
      * contient les définitions des unités de vitesse
      */
-    public static class Speed{
+    public final static class Speed{
+
+        /**
+         * constructeur privé
+         */
+        private Speed(){}
 
         /**
          * mètre par seconde

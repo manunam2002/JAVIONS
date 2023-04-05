@@ -17,6 +17,10 @@ public final class AdsbDemodulator {
 
     private final static int TIME_INTERVAL = 100;
 
+    private final static int WINDOW_SIZE = 1200;
+
+    public static final int MESSAGE_LENGTH = 112;
+
     private final PowerWindow powerWindow;
 
     /**
@@ -26,7 +30,7 @@ public final class AdsbDemodulator {
      * @throws IOException en cas d'erreur d'entrée
      */
     public AdsbDemodulator(InputStream samplesStream) throws IOException {
-        powerWindow = new PowerWindow(samplesStream, 1200);
+        powerWindow = new PowerWindow(samplesStream, WINDOW_SIZE);
     }
 
     /**
@@ -49,21 +53,21 @@ public final class AdsbDemodulator {
             timeStampNs += TIME_INTERVAL;
 
             byte[] message = new byte[14];
-            for (int index = 0; index < 8; ++index) {
+            for (int index = 0; index < Byte.SIZE; ++index) {
                 if (bitsDecoder(index))
-                    message[0] = (byte) (message[0] | 0x80 >>> (index % 8));
+                    message[0] = (byte) (message[0] | 0x80 >>> (index % Byte.SIZE));
             }
 
             int df = (message[0] & 0xFF) >>> 3;
             if (df == 17) {
-                for (int index = 8; index < 112; ++index) {
+                for (int index = Byte.SIZE; index < MESSAGE_LENGTH; ++index) {
                     if (bitsDecoder(index))
-                        message[index / 8] = (byte) (message[index / 8] | 0x80 >>> (index % 8));
+                        message[index / Byte.SIZE] = (byte) (message[index / Byte.SIZE] | 0x80 >>> (index % Byte.SIZE));
                 }
                 rawMessage = RawMessage.of(timeStampNs, message);
                 if (rawMessage != null) {
-                    timeStampNs += 1200 * TIME_INTERVAL;
-                    powerWindow.advanceBy(1200);
+                    timeStampNs += WINDOW_SIZE * TIME_INTERVAL;
+                    powerWindow.advanceBy(WINDOW_SIZE);
                 } else {
                     timeStampNs += TIME_INTERVAL;
                     powerWindow.advance();

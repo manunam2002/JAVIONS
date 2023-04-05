@@ -17,6 +17,7 @@ public class AircraftStateAccumulator <T extends AircraftStateSetter> {
     private final T stateSetter;
 
     private AirbornePositionMessage lastPositionMessage0;
+
     private AirbornePositionMessage lastPositionMessage1;
 
 

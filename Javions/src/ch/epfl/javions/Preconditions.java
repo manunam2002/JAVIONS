@@ -20,9 +20,7 @@ public final class Preconditions {
      * @throws IllegalArgumentException si le paramètre est faux
      */
     public static void checkArgument (boolean shouldBeTrue){
-        if (!shouldBeTrue) {
-            throw new IllegalArgumentException();
-        }
+        if (!shouldBeTrue) throw new IllegalArgumentException();
     }
 
 }

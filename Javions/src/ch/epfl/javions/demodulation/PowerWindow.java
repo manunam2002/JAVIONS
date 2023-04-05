@@ -17,12 +17,19 @@ import java.util.Objects;
 public final class PowerWindow {
 
     private final int windowSize;
+
     private final PowerComputer powerComputer;
+
     private int[] Batch1;
+
     private final int[] Batch2;
+
     private int position = 0;
+
     private int currentBatch = 0;
+
     private final static int BATCH_SIZE = 65536;
+
     private int batchRead = 0;
 
     /**

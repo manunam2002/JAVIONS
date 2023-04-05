@@ -71,12 +71,11 @@ public final class ByteString {
      * au nombre d'octets contenus dans une valeur de type long
      */
     public long bytesInRange(int fromIndex, int toIndex){
-        Objects.checkIndex(toIndex,bytes.length+1);
-        Objects.checkIndex(fromIndex,bytes.length);
-        Preconditions.checkArgument(toIndex-fromIndex >= 0 && toIndex-fromIndex < 8);
+        Objects.checkFromToIndex(fromIndex,toIndex,bytes.length);
+        Preconditions.checkArgument(toIndex-fromIndex >= 0 && toIndex-fromIndex < Byte.SIZE);
         long value = 0;
         for (int i = 0 ; i < toIndex-fromIndex ; ++i){
-            long l = (long) byteAt(toIndex - i - 1) << 8*i;
+            long l = (long) byteAt(toIndex - i - 1) << Byte.SIZE*i;
             value = value | l;
         }
         return value;
@@ -85,9 +84,7 @@ public final class ByteString {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof ByteString){
-            if (( (ByteString) obj).size() == this.size()){
-                return Arrays.equals(this.bytes, ((ByteString) obj).bytes);
-            }
+            return Arrays.equals(this.bytes, ((ByteString) obj).bytes);
         }
         return false;
     }

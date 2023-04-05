@@ -24,7 +24,7 @@ import java.util.Objects;
 public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress, double altitude,
                                       int parity, double x, double y) implements Message {
 
-    private static final byte[] index = new byte[]{9,3,10,4,11,5,6,0,7,1,8,2};
+    private static final byte[] DETANGLE_INDEXES = new byte[]{9,3,10,4,11,5,6,0,7,1,8,2};
 
     /**
      * constructeur compact
@@ -66,7 +66,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         } else {
             int orderedALT = 0;
             for (int i = 0 ; i < 12 ; ++i){
-                if (Bits.testBit(ALT,i)) orderedALT = (orderedALT | (1 << index[i])) & 0xFFF;
+                if (Bits.testBit(ALT,i)) orderedALT = (orderedALT | (1 << DETANGLE_INDEXES[i])) & 0xFFF;
             }
             int f100Gray = Bits.extractUInt(orderedALT,0,3);
             int f500Gray = Bits.extractUInt(orderedALT,3,9);

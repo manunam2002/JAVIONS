@@ -15,9 +15,12 @@ import java.io.InputStream;
 public final class PowerComputer {
 
     private final int batchSize;
+
     private final SamplesDecoder samplesDecoder;
+
     private final short[] batchDecoded;
-    private final short[] lastSamples = new short[8];
+
+    private final short[] lastSamples = new short[Byte.SIZE];
 
     /**
      * constructeur public
@@ -26,7 +29,7 @@ public final class PowerComputer {
      * @throws IllegalArgumentException si la taille des lots n'est pas un multiple de 8 strictement positif
      */
     public PowerComputer(InputStream stream, int batchSize){
-        Preconditions.checkArgument(batchSize % 8 == 0 && batchSize > 0);
+        Preconditions.checkArgument(batchSize % Byte.SIZE == 0 && batchSize > 0);
         this.batchSize = batchSize;
         samplesDecoder = new SamplesDecoder(stream,batchSize*2);
         batchDecoded = new short[batchSize*2];
@@ -44,7 +47,7 @@ public final class PowerComputer {
         Preconditions.checkArgument(batch.length == batchSize);
         int decodedSamples = samplesDecoder.readBatch(batchDecoded);
         for(int i = 0 ; i < decodedSamples ; ++i){
-            int index = i%8;
+            int index = i % Byte.SIZE;
             lastSamples[index] = batchDecoded[i];
             if ((i + 1) % 2 == 0) batch[(i - 1) / 2] = powerCalculator(index,lastSamples);
         }
@@ -58,8 +61,8 @@ public final class PowerComputer {
      * @return l'échantillon de puissance calculé
      */
     private int powerCalculator(int index, short[] lastSamples){
-        int[] calculatedIndex = new int[8];
-        for (int i = 0 ; i < 8 ; i++){
+        int[] calculatedIndex = new int[Byte.SIZE];
+        for (int i = 0 ; i < Byte.SIZE ; i++){
             calculatedIndex[i] = indexCalculator(index,i);
         }
         int evenSamples = lastSamples[calculatedIndex[6]] - lastSamples[calculatedIndex[4]]
@@ -77,7 +80,7 @@ public final class PowerComputer {
      */
     private int indexCalculator(int index, int j){
         int indexJ = index - j;
-        if (indexJ < 0) indexJ += 8;
+        if (indexJ < 0) indexJ += Byte.SIZE;
         return indexJ;
     }
 }

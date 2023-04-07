@@ -39,7 +39,7 @@ public final class SamplesDecoder {
     /**
      * lit depuis le flot passé au constructeur le nombre d'octets correspondant à un lot
      * puis convertit ces octets en échantillons signés
-     * @param batch le tableau ou sont placés les échantillons
+     * @param batch le tableau où sont placés les échantillons
      * @return le nombre d'échantillons converti
      * @throws IOException en cas d'erreur d'entrée
      * @throws IllegalArgumentException si la taille du tableau passé en argument n'est pas égale à la taille d'un lot

@@ -1,7 +1,7 @@
 package ch.epfl.javions;
 
 /**
- * contient la definitions des prefixes SI utiles au projet
+ * contient les définitions des préfixes SI utiles au projet
  *
  * @author Manu Cristini (358484)
  * @author Youssef Esseddik (346488)

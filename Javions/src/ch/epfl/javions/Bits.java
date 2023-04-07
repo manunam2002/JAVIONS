@@ -16,8 +16,8 @@ public final class Bits {
     private Bits(){}
 
     /**
-     * qui extrait du vecteur de 64 bits value la plage de size bits commençant au bit d'index start,
-     * qu'elle interprète comme une valeur non signée,
+     * extrait du vecteur de 64 bits value la plage de size bits commençant au bit d'index start,
+     * qu'elle interprète comme une valeur non signée
      * @param value valeur donnée
      * @param start index de départ
      * @param size taille du vecteur

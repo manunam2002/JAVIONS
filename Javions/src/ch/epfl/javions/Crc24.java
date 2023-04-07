@@ -47,7 +47,7 @@ public final class Crc24 {
     /**
      * algorithme bit à bit qui retourne le CRC24 du tableau donné
      * @param generator le générateur
-     * @param table le tableau donnée
+     * @param table le tableau donné
      * @return le CRC24 correspondant
      */
     private static int crc_bitwise(int generator, byte[] table){

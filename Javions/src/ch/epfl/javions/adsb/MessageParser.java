@@ -15,7 +15,7 @@ public class MessageParser {
 
     /**
      * retourne l'instance correspondant au message brut donné, ou null si le code de type
-     * de ce dernier ne correspond à aucun de ces trois types de messages, ou si il est invalide
+     * de ce dernier ne correspond à aucun de ces trois types de messages, ou s'il est invalide
      * @param rawMessage le message brut donné
      * @return l'instance correspondant au message brut donné
      */

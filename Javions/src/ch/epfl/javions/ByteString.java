@@ -60,7 +60,7 @@ public final class ByteString {
     }
 
     /**
-     * qui retourne les octets compris entre les index fromIndex (inclus) et toIndex (exclu)
+     * retourne les octets compris entre les index fromIndex (inclus) et toIndex (exclu)
      * sous la forme d'une valeur de type long
      * @param fromIndex index de départ
      * @param toIndex index d'arrivée

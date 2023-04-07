@@ -43,8 +43,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return le message ADS-B brut
      */
     public static RawMessage of(long timeStampNs, byte[] bytes){
-        if (CRC_24.crc(bytes) != 0) return null;
-        return new RawMessage(timeStampNs, new ByteString(bytes));
+        return (CRC_24.crc(bytes) != 0) ? null : new RawMessage(timeStampNs, new ByteString(bytes));
     }
 
     /**
@@ -53,8 +52,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return la taille d'un message
      */
     public static int size(byte byte0){
-        if (( (byte0 >>> 3) & 0x1F) == 17) return LENGTH;
-        return 0;
+        return (( (byte0 >>> 3) & 0x1F) == 17) ? LENGTH : 0;
     }
 
     /**

@@ -83,10 +83,7 @@ public final class PowerWindow {
     public int get(int i){
         Objects.checkIndex(i,windowSize);
         int index = position + i - currentBatch*BATCH_SIZE;
-        if (index >= BATCH_SIZE){
-            return Batch2[index - BATCH_SIZE];
-        }
-        return Batch1[index];
+        return (index >= BATCH_SIZE) ? Batch2[index - BATCH_SIZE] : Batch1[index];
     }
 
     /**

@@ -22,6 +22,8 @@ public final class PowerComputer {
 
     private final short[] lastSamples = new short[Byte.SIZE];
 
+    private final int[] calculatedIndex = new int[Byte.SIZE];
+
     /**
      * constructeur public
      * @param stream le flot d'entée donné
@@ -61,7 +63,6 @@ public final class PowerComputer {
      * @return l'échantillon de puissance calculé
      */
     private int powerCalculator(int index, short[] lastSamples){
-        int[] calculatedIndex = new int[Byte.SIZE];
         for (int i = 0 ; i < Byte.SIZE ; i++){
             calculatedIndex[i] = indexCalculator(index,i);
         }

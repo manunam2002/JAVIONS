@@ -13,7 +13,7 @@ public record GeoPos(int longitudeT32, int latitudeT32) {
     /**
      * latitude maximale en T32 (2^30)
      */
-    private static int MAX_LATITUDE = 1 << 30;
+    private final static int MAX_LATITUDE = 1 << 30;
 
     /**
      * constructeur public compact

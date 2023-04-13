@@ -38,8 +38,15 @@ public final class AircraftStateManager {
                 observableAircraftStates.add(aircraftState);
             }
         } else {
-            map.put(icaoAddress, new AircraftStateAccumulator<>
-                    (new ObservableAircraftState(icaoAddress,aircraftDatabase.get(icaoAddress))));
+            AircraftStateAccumulator aircraftStateAccumulator =
+                    new AircraftStateAccumulator<>(new ObservableAircraftState
+                            (icaoAddress,aircraftDatabase.get(icaoAddress)));
+            aircraftStateAccumulator.update(message);
+            ObservableAircraftState aircraftState = (ObservableAircraftState) aircraftStateAccumulator.stateSetter();
+            map.put(icaoAddress,aircraftStateAccumulator);
+            if (aircraftState.getPosition() != null){
+                observableAircraftStates.add(aircraftState);
+            }
         }
         lastMessageTimeStampNs = message.timeStampNs();
     }

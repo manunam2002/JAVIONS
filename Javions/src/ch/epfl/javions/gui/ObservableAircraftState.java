@@ -12,19 +12,19 @@ import javafx.collections.ObservableList;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Double.NaN;
+
 public final class ObservableAircraftState implements AircraftStateSetter {
 
     private final IcaoAddress icaoAddress;
     private final AircraftData aircraftData;
-    private final LongProperty lastMessageTimeStampNs = new SimpleLongProperty();
-    private final IntegerProperty category = new SimpleIntegerProperty();
-    private final ObjectProperty<CallSign> callSign = new SimpleObjectProperty<>();
-    private final ObjectProperty<GeoPos> position = new SimpleObjectProperty<>();
-    private final DoubleProperty altitude = new SimpleDoubleProperty();
-    private final DoubleProperty velocity = new SimpleDoubleProperty();
-    private final DoubleProperty trackOrHeading = new SimpleDoubleProperty();
-    private final ListProperty<AirbornePos> trajectory1 = new SimpleListProperty<>();
-    private List<AirbornePos> trajectory = new ArrayList<>();
+    private final LongProperty lastMessageTimeStampNs = new SimpleLongProperty(0);
+    private final IntegerProperty category = new SimpleIntegerProperty(0);
+    private final ObjectProperty<CallSign> callSign = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<GeoPos> position = new SimpleObjectProperty<>(null);
+    private final DoubleProperty altitude = new SimpleDoubleProperty(NaN);
+    private final DoubleProperty velocity = new SimpleDoubleProperty(NaN);
+    private final DoubleProperty trackOrHeading = new SimpleDoubleProperty(NaN);
     private ObservableList<AirbornePos> observableTrajectory = FXCollections.observableArrayList();
     private ObservableList<AirbornePos> unmodifiableTrajectory =
             FXCollections.unmodifiableObservableList(observableTrajectory);
@@ -96,7 +96,13 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     public void setPosition(GeoPos position) {
         if (position != null){
             this.position.set(position);
-            addAirbornePos(position,getAltitude());
+            if (observableTrajectory.isEmpty() ||
+                    position.latitude() != observableTrajectory.get(observableTrajectory.size()-1).position.latitude()
+                    || position.longitude() !=
+                    observableTrajectory.get(observableTrajectory.size()-1).position.longitude()){
+                observableTrajectory.add(new AirbornePos(position,getAltitude()));
+                lastPositionMessageTimeStampNs = getLastMessageTimeStampNs();
+            }
         }
     }
 
@@ -111,7 +117,9 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     @Override
     public void setAltitude(double altitude) {
         this.altitude.set(altitude);
-        addAirbornePos(getPosition(), altitude);
+        if (lastPositionMessageTimeStampNs == getLastMessageTimeStampNs()){
+            observableTrajectory.set(observableTrajectory.size()-1,new AirbornePos(getPosition(),altitude));
+        }
     }
 
     public ReadOnlyDoubleProperty velocityProperty(){
@@ -140,26 +148,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         this.trackOrHeading.set(trackOrHeading);
     }
 
-    public ReadOnlyListProperty<AirbornePos> trajectoryProperty(){
-        return trajectory1;
-    }
-
     public List<AirbornePos> getTrajectory(){
         return unmodifiableTrajectory;
-    }
-
-    private void addAirbornePos(GeoPos position, double altitude){
-        if (getLastMessageTimeStampNs() == lastPositionMessageTimeStampNs){
-            AirbornePos airbornePos = new AirbornePos(position,altitude);
-            trajectory.set(trajectory.size()-1,airbornePos);
-        } else {
-            if (observableTrajectory.isEmpty() ||
-                    position.latitude() != observableTrajectory.get(trajectory.size()-1).position.latitude() ||
-                    position.longitude() != observableTrajectory.get(trajectory.size()-1).position.longitude()){
-                AirbornePos airbornePos = new AirbornePos(position,altitude);
-                trajectory.add(airbornePos);
-                lastPositionMessageTimeStampNs = getLastMessageTimeStampNs();
-            }
-        }
     }
 }

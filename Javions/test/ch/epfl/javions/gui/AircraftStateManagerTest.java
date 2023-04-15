@@ -35,7 +35,7 @@ public class AircraftStateManagerTest {
                     System.out.printf("%13d: %s\n", timeStampNs, message);
                 }
             }
-        } catch (EOFException e) { /* nothing to do */ }
+        } catch (EOFException e) {}
     }
 
     @Test
@@ -61,7 +61,7 @@ public class AircraftStateManagerTest {
                 aircraftStateManager.updateWithMessage(message1);
                 aircraftStateManager.purge();
 
-                if (aircraftStateManager.states().size() == 8){
+                //if (aircraftStateManager.states().size() == 8){
                     list.addAll(aircraftStateManager.states());
                     list.sort(new AddressComparator());
 
@@ -85,7 +85,7 @@ public class AircraftStateManagerTest {
                         }
                     }
                     break;
-                }
+                //}
             }
         } catch (EOFException e) { /* nothing to do */ }
     }

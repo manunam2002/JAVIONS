@@ -16,7 +16,7 @@ import java.util.List;
 
 public class AircraftStateManagerTest {
 
-    final char[] directions = new char[]{'↑','↗','→','↘','↓','↙','←','↖'};
+    final static char[] directions = new char[]{'↑','↗','→','↘','↓','↙','←','↖'};
 
     @Test
     void readGivenFile() throws IOException {
@@ -90,7 +90,7 @@ public class AircraftStateManagerTest {
         } catch (EOFException e) { /* nothing to do */ }
     }
 
-    private char returnDirection(double trackOrHeading){
+    private static char returnDirection(double trackOrHeading){
         if (trackOrHeading > 15*Math.PI/8 || trackOrHeading < Math.PI/8) return directions[0];
         if (trackOrHeading > Math.PI/8 && trackOrHeading < 3*Math.PI/8) return directions[1];
         if (trackOrHeading > 3*Math.PI/8 && trackOrHeading < 5*Math.PI/8) return directions[2];
@@ -102,7 +102,7 @@ public class AircraftStateManagerTest {
         return ' ';
     }
 
-    private static class AddressComparator
+    protected static class AddressComparator
             implements Comparator<ObservableAircraftState> {
         @Override
         public int compare(ObservableAircraftState o1,

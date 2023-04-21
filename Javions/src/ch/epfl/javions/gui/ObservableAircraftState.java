@@ -32,7 +32,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     private final DoubleProperty trackOrHeading = new SimpleDoubleProperty(NaN);
     private final ObservableList<AirbornePos> observableTrajectory = FXCollections.observableArrayList();
     private final ObservableList<AirbornePos> unmodifiableTrajectory =
-            FXCollections.unmodifiableObservableList(observableTrajectory); //public?
+            FXCollections.unmodifiableObservableList(observableTrajectory);
     private long lastPositionMessageTimeStampNs;
 
     /**

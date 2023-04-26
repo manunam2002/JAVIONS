@@ -3,12 +3,13 @@ package ch.epfl.javions.gui;
 import ch.epfl.javions.GeoPos;
 import ch.epfl.javions.WebMercator;
 import javafx.application.Platform;
+import javafx.beans.property.*;
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.io.IOException;
 
 public class BaseMapController {
@@ -20,44 +21,64 @@ public class BaseMapController {
     private Canvas canvas;
 
     public BaseMapController(TileManager tileManager, MapParameters mapParameters){
+
         this.tileManager = tileManager;
         this.mapParameters = mapParameters;
-        pane = new Pane();
+
         canvas = new Canvas();
-        pane.getChildren().add(canvas);
+        pane = new Pane(canvas);
+        canvas.widthProperty().bind(pane.widthProperty());
+        canvas.heightProperty().bind(pane.heightProperty());
+
+        canvas.widthProperty().addListener((p, o, n) -> redrawOnNextPulse());
+        canvas.heightProperty().addListener((p, o, n) -> redrawOnNextPulse());
+
+        mapParameters.zoomProperty().addListener((p, o, n) -> redrawOnNextPulse());
+        mapParameters.minXProperty().addListener((p, o, n) -> redrawOnNextPulse());
+        mapParameters.minYProperty().addListener((p, o, n) -> redrawOnNextPulse());
+
         canvas.sceneProperty().addListener((p, oldS, newS) -> {
             assert oldS == null;
             newS.addPreLayoutPulseListener(this::redrawIfNeeded);
         });
-        addListeners();
+
+        LongProperty minScrollTime = new SimpleLongProperty();
+        pane.setOnScroll(e -> {
+            int zoomDelta = (int) Math.signum(e.getDeltaY());
+            if (zoomDelta == 0) return;
+
+            long currentTime = System.currentTimeMillis();
+            if (currentTime < minScrollTime.get()) return;
+            minScrollTime.set(currentTime + 200);
+
+            Point2D delta = canvas.sceneToLocal(e.getSceneX(),e.getSceneY());
+            mapParameters.scroll(delta.getX(),delta.getY());
+            mapParameters.changeZoomLevel(zoomDelta);
+            mapParameters.scroll(-delta.getX(),-delta.getY());
+        });
+
+        ObjectProperty<Point2D> start = new SimpleObjectProperty<>(null);
+        pane.setOnMousePressed(e -> {
+            start.set(new Point2D(e.getX(),e.getY()));
+        });
+        pane.setOnMouseDragged(e -> {
+            mapParameters.scroll(start.get().getX()-e.getX(),start.get().getY()-e.getY());
+            start.set(new Point2D(e.getX(),e.getY()));
+        });
+        pane.setOnMouseReleased(end -> {
+            start.set(null);
+        });
     }
 
     public Pane pane(){
-        canvas.widthProperty().bind(pane.widthProperty());
-        canvas.heightProperty().bind(pane.heightProperty());
-
-        double height = canvas.getHeight();
-        double width = canvas.getWidth();
-
-        int X = (int) Math.floor(mapParameters.minX()/256);
-        int Y = (int) Math.floor(mapParameters.minY()/256);
-        int X1 = (int) Math.floor((mapParameters.minX()+width)/256);
-        int Y1 = (int) Math.floor((mapParameters.minY()-height)/256);
-
-        for (int i = X ; i < X1; ++i){
-            for (int j = Y ; j > Y1 ; --j){
-                try {
-                    Image tile = tileManager.imageForTileAt(new TileManager.TileId(mapParameters.zoom(), i, j));
-                    canvas.getGraphicsContext2D().drawImage(tile,i,j);
-                } catch (IOException ioException){}
-            }
-        }
         return pane;
     }
 
     public void centerOn(GeoPos point){
-        double deltaX = WebMercator.x(mapParameters.zoom(), point.longitude()) - mapParameters.minX();
-        double deltaY = WebMercator.y(mapParameters.zoom(), point.latitude()) - mapParameters.minY();
+        double deltaX = WebMercator.x(mapParameters.zoom(), point.longitude()) - mapParameters.minX()
+                + canvas.getWidth()/2;
+        double deltaY = WebMercator.y(mapParameters.zoom(), point.latitude()) - mapParameters.minY()
+                + canvas.getHeight()/2;
         mapParameters.scroll(deltaX,deltaY);
     }
 
@@ -65,7 +86,7 @@ public class BaseMapController {
         if (!redrawNeeded) return;
         redrawNeeded = false;
 
-        pane();
+        draw();
     }
 
     private void redrawOnNextPulse(){
@@ -73,9 +94,24 @@ public class BaseMapController {
         Platform.requestNextPulse();
     }
 
-    private void addListeners(){
-        mapParameters.zoomProperty().addListener( e -> redrawOnNextPulse());
-        mapParameters.minXProperty().addListener( e -> redrawOnNextPulse());
-        mapParameters.minYProperty().addListener( e -> redrawOnNextPulse());
+    private void draw(){
+
+        double height = canvas.getHeight();
+        double width = canvas.getWidth();
+        int X = (int) Math.floor(mapParameters.minX()/256);
+        int Y = (int) Math.floor(mapParameters.minY()/256);
+        double deltaX = mapParameters.minX() - X*256;
+        double deltaY = mapParameters.minY() - Y*256;
+        GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+
+        for (int i = 0; i <= width+deltaX; i += 256){
+            for (int j = 0; j <= height+deltaY; j+= 256){
+                try {
+                    Image tile = tileManager.imageForTileAt(
+                            new TileManager.TileId(mapParameters.zoom(),X + i/256, Y + j/256));
+                    graphicsContext.drawImage(tile,i-deltaX,j-deltaY);
+                } catch (IOException e) {}
+            }
+        }
     }
 }

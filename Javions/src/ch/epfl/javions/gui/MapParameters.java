@@ -41,12 +41,16 @@ public class MapParameters {
         return minY.get();
     }
 
-    public void scroll(double deltaX, double deltaY){
-        minX.set(minX() + deltaX);
-        minY.set(minY() + deltaY);
+    public void scroll(double X, double Y){
+        minX.set(minX()+X);
+        minY.set(minY()+Y);
     }
 
     public void changeZoomLevel(int delta){
-        zoom.set(Math2.clamp(6,zoom() + delta,19));
+        int clampedDelta = Math2.clamp(6-zoom(),delta,19-zoom());
+        if (clampedDelta == 0) return;
+        zoom.set(zoom() + clampedDelta);
+        minX.set(Math.scalb(minX(),clampedDelta));
+        minY.set(Math.scalb(minY(),clampedDelta));
     }
 }

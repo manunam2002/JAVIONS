@@ -1,5 +1,6 @@
 package ch.epfl.javions.gui;
 
+import ch.epfl.javions.Preconditions;
 import javafx.scene.image.Image;
 
 import java.io.*;
@@ -54,6 +55,10 @@ public final class TileManager {
     }
 
     public record TileId(int zoom, int x, int y){
+
+        /*public TileId{
+            Preconditions.checkArgument(isValid(zoom,x,y));
+        }*/
 
         public static boolean isValid(int zoom, int x, int y){
             int max = 1 << zoom;

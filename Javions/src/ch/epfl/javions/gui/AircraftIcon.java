@@ -9,6 +9,9 @@ import java.util.Map;
 
 import static ch.epfl.javions.aircraft.WakeTurbulenceCategory.HEAVY;
 
+/**
+ * représente les différentes icônes d'aéronefs disponibles
+ */
 public enum AircraftIcon {
     AIRLINER("""
             M 0.01 14.75 c -0.26 0 -0.74 -0.71 -0.86 -1.41 l -3.33 0.86 L -4.5
@@ -149,11 +152,20 @@ public enum AircraftIcon {
     private final boolean canRotate;
     private final String svgPath;
 
+    /**
+     * constructeur public
+     * @param canRotate vrai ssi l'icône peut être tournée
+     * @param svgPath le chemin SVG correspondant à l'icône
+     */
     AircraftIcon(boolean canRotate, String svgPath) {
         this.canRotate = canRotate;
         this.svgPath = svgPath;
     }
 
+    /**
+     * constructeur public
+     * @param svgPath le chemin SVG correspondant à l'icône
+     */
     AircraftIcon(String svgPath) {
         this(true, svgPath);
     }
@@ -402,6 +414,14 @@ public enum AircraftIcon {
         return Map.copyOf(map);
     }
 
+    /**
+     * retourne l'icône correspondant le mieux à l'aéronef dont les caractéristiques sont celles données
+     * @param typeDesignator l'indicateur de type de l'aéronef
+     * @param typeDescription la description de l'aéronef
+     * @param category la catégorie de l'aéronef
+     * @param wakeTurbulenceCategory la catégorie de turbulence de sillage d'un aéronef
+     * @return l'icône correspondant le mieux à l'aéronef dont les caractéristiques sont celles données
+     */
     public static AircraftIcon iconFor(AircraftTypeDesignator typeDesignator,
                                        AircraftDescription typeDescription,
                                        int category,
@@ -443,10 +463,18 @@ public enum AircraftIcon {
         };
     }
 
+    /**
+     * retourne vrai ssi l'icône peut être tournée
+     * @return vrai ssi l'icône peut être tournée
+     */
     public boolean canRotate() {
         return canRotate;
     }
 
+    /**
+     * retourne le chemin SVG correspondant à l'icône
+     * @return le chemin SVG correspondant à l'icône
+     */
     public String svgPath() {
         return svgPath;
     }

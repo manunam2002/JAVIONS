@@ -261,7 +261,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
      * retourne la trajectoire de l'aéronef
      * @return la trajectoire de l'aéronef
      */
-    public List<AirbornePos> getTrajectory(){
+    public ObservableList<AirbornePos> getTrajectory(){
         return unmodifiableTrajectory;
     }
 }

@@ -12,14 +12,25 @@ import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 
+/**
+ * gère l'affichage et l'interaction avec le fond de carte
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
+ */
 public class BaseMapController {
 
     private final TileManager tileManager;
     private final MapParameters mapParameters;
     private boolean redrawNeeded;
-    private Pane pane;
-    private Canvas canvas;
+    private final Pane pane;
+    private final Canvas canvas;
 
+    /**
+     * contructeur public
+     * @param tileManager le gestionnaire de tuiles à utiliser pour obtenir les tuiles de la carte
+     * @param mapParameters les paramètres de la portion visible de la carte
+     */
     public BaseMapController(TileManager tileManager, MapParameters mapParameters){
 
         this.tileManager = tileManager;
@@ -58,22 +69,26 @@ public class BaseMapController {
         });
 
         ObjectProperty<Point2D> start = new SimpleObjectProperty<>(null);
-        pane.setOnMousePressed(e -> {
-            start.set(new Point2D(e.getX(),e.getY()));
-        });
+        pane.setOnMousePressed(e -> start.set(new Point2D(e.getX(),e.getY())));
         pane.setOnMouseDragged(e -> {
             mapParameters.scroll(start.get().getX()-e.getX(),start.get().getY()-e.getY());
             start.set(new Point2D(e.getX(),e.getY()));
         });
-        pane.setOnMouseReleased(end -> {
-            start.set(null);
-        });
+        pane.setOnMouseReleased(end -> start.set(null));
     }
 
+    /**
+     * retourne le panneau JavaFX affichant le fond de carte
+     * @return le panneau JavaFX affichant le fond de carte
+     */
     public Pane pane(){
         return pane;
     }
 
+    /**
+     * déplace la portion visible de la carte afin qu'elle soit centrée en le point donné
+     * @param point le point donné
+     */
     public void centerOn(GeoPos point){
         double deltaX = WebMercator.x(mapParameters.zoom(), point.longitude()) - mapParameters.minX()
                 + canvas.getWidth()/2;
@@ -82,6 +97,9 @@ public class BaseMapController {
         mapParameters.scroll(deltaX,deltaY);
     }
 
+    /**
+     * redessinne la carte si c'est nécessaire
+     */
     private void redrawIfNeeded(){
         if (!redrawNeeded) return;
         redrawNeeded = false;
@@ -89,11 +107,17 @@ public class BaseMapController {
         draw();
     }
 
+    /**
+     * redessinne la carte au prochain battement
+     */
     private void redrawOnNextPulse(){
         redrawNeeded = true;
         Platform.requestNextPulse();
     }
 
+    /**
+     * dessinne la carte sur le panneau
+     */
     private void draw(){
 
         double height = canvas.getHeight();

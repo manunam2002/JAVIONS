@@ -10,7 +10,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
@@ -62,12 +61,7 @@ public final class AircraftController {
             if (change.wasRemoved()) {
                 // plus optimale ?
                 String id = change.getElementRemoved().getIcaoAddress().string();
-                for (Node child : pane.getChildren()) {
-                    if (child.getId().equals(id)) {
-                        pane.getChildren().remove(child);
-                        return;
-                    }
-                }
+                pane.getChildren().removeIf(group -> group.getId().equals(id));
             }
                 });
 
@@ -89,6 +83,7 @@ public final class AircraftController {
      * @param aircraftState l'état de l'aéronef
      */
     private void addGroup(ObservableAircraftState aircraftState){
+        //à contôler
         if (aircraftState.getAircraftData() == null) return;
 
         Group aircraftGroup = new Group();

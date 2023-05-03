@@ -2,6 +2,8 @@ package ch.epfl.javions.gui;
 
 import ch.epfl.javions.Units;
 import ch.epfl.javions.WebMercator;
+import ch.epfl.javions.aircraft.AircraftDescription;
+import ch.epfl.javions.aircraft.AircraftTypeDesignator;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
@@ -32,7 +34,6 @@ import static javafx.scene.paint.CycleMethod.NO_CYCLE;
 public final class AircraftController {
 
     private final MapParameters mapParameters;
-    private final ObservableSet<ObservableAircraftState> states;
     private final ObjectProperty<ObservableAircraftState> selectedAircraft;
     private final Pane pane;
 
@@ -46,7 +47,6 @@ public final class AircraftController {
                               ObservableSet<ObservableAircraftState> states,
                               ObjectProperty<ObservableAircraftState> selectedAircraft){
         this.mapParameters = mapParameters;
-        this.states = states;
         this.selectedAircraft = selectedAircraft;
 
         pane = new Pane();
@@ -59,11 +59,10 @@ public final class AircraftController {
                 addGroup(change.getElementAdded());
             }
             if (change.wasRemoved()) {
-                // plus optimale ?
                 String id = change.getElementRemoved().getIcaoAddress().string();
                 pane.getChildren().removeIf(group -> group.getId().equals(id));
             }
-                });
+        });
 
         for (ObservableAircraftState aircraftState : states) {
             addGroup(aircraftState);
@@ -84,7 +83,7 @@ public final class AircraftController {
      */
     private void addGroup(ObservableAircraftState aircraftState){
         //à contôler
-        if (aircraftState.getAircraftData() == null) return;
+        //if (aircraftState.getAircraftData() == null) return;
 
         Group aircraftGroup = new Group();
         pane.getChildren().add(aircraftGroup);
@@ -211,15 +210,13 @@ public final class AircraftController {
                 mapParameters.zoomProperty(), selectedAircraft));
         Text text = new Text();
         StringBinding line0 = Bindings.createStringBinding(() -> {
-            if (aircraftState.getAircraftData().registration().string().isEmpty()){
-                if (aircraftState.getCallSign().string().isEmpty()){
-                    return aircraftState.getIcaoAddress().string();
-                } else {
-                    return aircraftState.getCallSign().string();
-                }
-            } else {
+            if (aircraftState.getAircraftData() != null &&
+                    !aircraftState.getAircraftData().registration().string().isEmpty())
                 return aircraftState.getAircraftData().registration().string();
-            }}, aircraftState.callSignProperty());
+            if (aircraftState.getCallSign()!= null && !aircraftState.getCallSign().string().isEmpty())
+                return aircraftState.getCallSign().string();
+            return aircraftState.getIcaoAddress().string();
+            }, aircraftState.callSignProperty());
         StringBinding line1 = Bindings.createStringBinding(() -> {
             String velocity = (Double.isNaN(aircraftState.getVelocity())) ? "?" :
                     String.valueOf((int) Units.convert(aircraftState.getVelocity(),
@@ -244,11 +241,14 @@ public final class AircraftController {
         SVGPath icon = new SVGPath();
         icon.getStyleClass().add("aircraft");
         iconAndLabelGroup.getChildren().add(icon);
-        ObjectBinding<AircraftIcon> aircraftIcon = Bindings.createObjectBinding(() ->
-                        AircraftIcon.iconFor(aircraftState.getAircraftData().typeDesignator(),
+        ObjectBinding<AircraftIcon> aircraftIcon = Bindings.createObjectBinding(() -> {
+                if (aircraftState.getAircraftData() == null) return AircraftIcon.iconFor(
+                        new AircraftTypeDesignator(""), new AircraftDescription(""), 0,
+                        null);
+                return AircraftIcon.iconFor(aircraftState.getAircraftData().typeDesignator(),
                                 aircraftState.getAircraftData().description(),
                                 aircraftState.getCategory(),
-                                aircraftState.getAircraftData().wakeTurbulenceCategory()),
+                                aircraftState.getAircraftData().wakeTurbulenceCategory());},
                 aircraftState.categoryProperty());
         icon.contentProperty().bind(Bindings.createStringBinding(() ->
                 aircraftIcon.get().svgPath()));

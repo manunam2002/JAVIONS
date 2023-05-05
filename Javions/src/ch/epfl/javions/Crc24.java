@@ -12,6 +12,9 @@ public final class Crc24 {
      * générateur utilisé pour calculer le CRC24 des messages ADS-B
      */
     public final static int GENERATOR = 0xFFF409;
+    private static final int CRC_BITS = 24;
+    private static final int CRC_SIZE = 3;
+    private final static int TABLE_SIZE = 256;
 
     private final int[] table;
 
@@ -31,17 +34,17 @@ public final class Crc24 {
     public int crc(byte[] bytes){
         int crc = 0;
         for (byte b : bytes) {
-            int n_1 = Bits.extractUInt(crc, 16, 8);
-            crc = (crc << 8) | Byte.toUnsignedInt(b);
+            int n_1 = Bits.extractUInt(crc, 16, Byte.SIZE);
+            crc = (crc << Byte.SIZE) | Byte.toUnsignedInt(b);
             crc = crc ^ table[n_1];
 
         }
-        for (int k = 0 ; k < 3 ; ++k){
-            int n_1 = Bits.extractUInt(crc,16,8);
-            crc = (crc << 8);
+        for (int k = 0; k < CRC_SIZE; ++k){
+            int n_1 = Bits.extractUInt(crc,16,Byte.SIZE);
+            crc = (crc << Byte.SIZE);
             crc = crc ^ table[n_1];
         }
-        return Bits.extractUInt(crc,0,24);
+        return Bits.extractUInt(crc,0, CRC_BITS);
     }
 
     /**
@@ -60,12 +63,12 @@ public final class Crc24 {
                 crc = crc ^ tab[n_1];
             }
         }
-        for (int k = 0 ; k < 24 ; ++k){
+        for (int k = 0; k < CRC_BITS; ++k){
             int n_1 = Bits.extractUInt(crc,23,1);
             crc = (crc << 1);
             crc = crc ^ tab[n_1];
         }
-        return Bits.extractUInt(crc,0,24);
+        return Bits.extractUInt(crc,0, CRC_BITS);
     }
 
     /**
@@ -74,8 +77,8 @@ public final class Crc24 {
      * @return la table de 256 entrées
      */
     private static int[] buildTable(int generator){
-        int[] table = new int[256];
-        for (int i = 0 ; i < 256; ++i){
+        int[] table = new int[TABLE_SIZE];
+        for (int i = 0 ; i < TABLE_SIZE; ++i){
             byte[] bytes = new byte[]{(byte) i};
             table[i] = crc_bitwise(generator,bytes);
         }

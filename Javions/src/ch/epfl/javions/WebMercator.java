@@ -20,7 +20,7 @@ public final class WebMercator {
      * @return la coordonnée x correspondante
      */
     public static double x (int zoomLevel, double longitude){
-        return Math.scalb(( Units.convertTo(longitude,Units.Angle.TURN)) + 0.5 ,8 + zoomLevel);
+        return value(( Units.convertTo(longitude,Units.Angle.TURN)) + 0.5, zoomLevel);
     }
 
     /**
@@ -30,7 +30,11 @@ public final class WebMercator {
      * @return la coordonnée y correspondante
      */
     public static double y (int zoomLevel, double latitude){
-        return Math.scalb(- (Math2.asinh(Math.tan(latitude))) / (2*Math.PI) + 0.5 , 8 + zoomLevel);
+        return value(- (Math2.asinh(Math.tan(latitude))) / (2*Math.PI) + 0.5, zoomLevel);
+    }
+
+    private static double value(double v, int zoomLevel){
+        return Math.scalb(v, 8 + zoomLevel);
     }
 }
 

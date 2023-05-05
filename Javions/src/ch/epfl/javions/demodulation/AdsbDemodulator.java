@@ -4,6 +4,7 @@ import ch.epfl.javions.adsb.RawMessage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 /**
  * représente un démodulateur de messages ADS-B
@@ -13,13 +14,15 @@ import java.io.InputStream;
  */
 public final class AdsbDemodulator {
 
+    private static final byte[] MESSAGE = new byte[RawMessage.LENGTH];
+
     private long timeStampNs = 0;
 
     private final static int TIME_INTERVAL = 100;
 
     private final static int WINDOW_SIZE = 1200;
 
-    public static final int MESSAGE_LENGTH = 112;
+    private static final int MESSAGE_LENGTH = 112;
 
     private final PowerWindow powerWindow;
 
@@ -52,19 +55,18 @@ public final class AdsbDemodulator {
             powerWindow.advance();
             timeStampNs += TIME_INTERVAL;
 
-            byte[] message = new byte[14];
+            Arrays.fill(MESSAGE, (byte) 0);
             for (int index = 0; index < Byte.SIZE; ++index) {
                 if (bitsDecoder(index))
-                    message[0] = (byte) (message[0] | 0x80 >>> (index % Byte.SIZE));
+                    MESSAGE[0] = (byte) (MESSAGE[0] | 0x80 >>> (index % Byte.SIZE));
             }
 
-            int df = (message[0] & 0xFF) >>> 3;
-            if (df == 17) {
+            if (RawMessage.size(MESSAGE[0]) != 0) {
                 for (int index = Byte.SIZE; index < MESSAGE_LENGTH; ++index) {
                     if (bitsDecoder(index))
-                        message[index / Byte.SIZE] = (byte) (message[index / Byte.SIZE] | 0x80 >>> (index % Byte.SIZE));
+                        MESSAGE[index / Byte.SIZE] = (byte) (MESSAGE[index / Byte.SIZE] | 0x80 >>> (index % Byte.SIZE));
                 }
-                rawMessage = RawMessage.of(timeStampNs, message);
+                rawMessage = RawMessage.of(timeStampNs, MESSAGE);
                 if (rawMessage != null) {
                     timeStampNs += WINDOW_SIZE * TIME_INTERVAL;
                     powerWindow.advanceBy(WINDOW_SIZE);

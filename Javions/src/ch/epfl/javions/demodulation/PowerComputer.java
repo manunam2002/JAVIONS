@@ -14,15 +14,17 @@ import java.io.InputStream;
  */
 public final class PowerComputer {
 
+    private static final int LAST_SAMPLES = Byte.SIZE;
+
     private final int batchSize;
 
     private final SamplesDecoder samplesDecoder;
 
     private final short[] batchDecoded;
 
-    private final short[] lastSamples = new short[Byte.SIZE];
+    private final short[] lastSamples;
 
-    private final int[] calculatedIndex = new int[Byte.SIZE];
+    private final int[] calculatedIndex;
 
     /**
      * constructeur public
@@ -31,10 +33,12 @@ public final class PowerComputer {
      * @throws IllegalArgumentException si la taille des lots n'est pas un multiple de 8 strictement positif
      */
     public PowerComputer(InputStream stream, int batchSize){
-        Preconditions.checkArgument(batchSize % Byte.SIZE == 0 && batchSize > 0);
+        Preconditions.checkArgument(batchSize % LAST_SAMPLES == 0 && batchSize > 0);
         this.batchSize = batchSize;
         samplesDecoder = new SamplesDecoder(stream,batchSize*2);
         batchDecoded = new short[batchSize*2];
+        lastSamples = new short[LAST_SAMPLES];
+        calculatedIndex = new int[LAST_SAMPLES];
     }
 
     /**
@@ -49,7 +53,7 @@ public final class PowerComputer {
         Preconditions.checkArgument(batch.length == batchSize);
         int decodedSamples = samplesDecoder.readBatch(batchDecoded);
         for(int i = 0 ; i < decodedSamples ; ++i){
-            int index = i % Byte.SIZE;
+            int index = i % LAST_SAMPLES;
             lastSamples[index] = batchDecoded[i];
             if ((i + 1) % 2 == 0) batch[(i - 1) / 2] = powerCalculator(index,lastSamples);
         }
@@ -63,7 +67,7 @@ public final class PowerComputer {
      * @return l'échantillon de puissance calculé
      */
     private int powerCalculator(int index, short[] lastSamples){
-        for (int i = 0 ; i < Byte.SIZE ; i++){
+        for (int i = 0; i < LAST_SAMPLES; i++){
             calculatedIndex[i] = indexCalculator(index,i);
         }
         int evenSamples = lastSamples[calculatedIndex[6]] - lastSamples[calculatedIndex[4]]
@@ -81,7 +85,7 @@ public final class PowerComputer {
      */
     private int indexCalculator(int index, int j){
         int indexJ = index - j;
-        if (indexJ < 0) indexJ += Byte.SIZE;
+        if (indexJ < 0) indexJ += LAST_SAMPLES;
         return indexJ;
     }
 }

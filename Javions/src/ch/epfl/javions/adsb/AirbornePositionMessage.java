@@ -86,14 +86,4 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
                 altitude, FORMAT, Math.scalb(LON_CPR,-17), Math.scalb(LAT_CPR,-17));
     }
-
-    @Override
-    public long timeStampNs() {
-        return timeStampNs;
-    }
-
-    @Override
-    public IcaoAddress icaoAddress() {
-        return icaoAddress;
-    }
 }

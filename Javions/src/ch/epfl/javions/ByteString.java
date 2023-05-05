@@ -12,6 +12,8 @@ import java.util.Objects;
  */
 public final class ByteString {
 
+    private static final HexFormat HEX_FORMAT = HexFormat.of();
+
     private final byte[] bytes;
 
     /**
@@ -30,10 +32,8 @@ public final class ByteString {
      * @throws NumberFormatException si elle contient un caractère qui n'est pas un chiffre hexadécimal
      */
     public static ByteString ofHexadecimalString(String hexString){
-        int length = hexString.length();
-        Preconditions.checkArgument(length%2 == 0);
         try {
-            byte[] bytesArray = HexFormat.of().parseHex(hexString);
+            byte[] bytesArray = HEX_FORMAT.parseHex(hexString);
             return new ByteString(bytesArray);
         } catch (IllegalArgumentException e) {
             throw new NumberFormatException();
@@ -55,8 +55,7 @@ public final class ByteString {
      * @throws IndexOutOfBoundsException si l'index est invalide
      */
     public int byteAt(int index){
-        Objects.checkIndex(index,bytes.length);
-        return bytes[index] & 0xFF;
+        return Byte.toUnsignedInt(bytes[index]);
     }
 
     /**
@@ -72,7 +71,7 @@ public final class ByteString {
      */
     public long bytesInRange(int fromIndex, int toIndex){
         Objects.checkFromToIndex(fromIndex,toIndex,bytes.length);
-        Preconditions.checkArgument(toIndex-fromIndex >= 0 && toIndex-fromIndex < Byte.SIZE);
+        Preconditions.checkArgument(toIndex-fromIndex < Long.BYTES);
         long value = 0;
         for (int i = 0 ; i < toIndex-fromIndex ; ++i){
             long l = (long) byteAt(toIndex - i - 1) << Byte.SIZE*i;
@@ -96,7 +95,7 @@ public final class ByteString {
 
     @Override
     public String toString() {
-        return HexFormat.of().withUpperCase().formatHex(bytes);
+        return HEX_FORMAT.withUpperCase().formatHex(bytes);
     }
 }
 

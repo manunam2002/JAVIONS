@@ -15,6 +15,8 @@ import java.util.Objects;
  */
 public final class SamplesDecoder {
 
+    private static final int TO_SIGNED = 2048;
+
     private final InputStream stream;
 
     private final int batchSize;
@@ -30,10 +32,9 @@ public final class SamplesDecoder {
      */
     public SamplesDecoder(InputStream stream, int batchSize) {
         Preconditions.checkArgument(batchSize > 0);
-        Objects.requireNonNull(stream);
-        this.stream = stream;
+        this.stream = Objects.requireNonNull(stream);
         this.batchSize = batchSize;
-        batchBytes = new byte[batchSize*2];
+        batchBytes = new byte[batchSize*Short.BYTES];
     }
 
     /**
@@ -49,8 +50,8 @@ public final class SamplesDecoder {
         int bytesRead = stream.readNBytes(batchBytes, 0, batchSize*2);
         for (int i = 0 ; i < batchSize ; ++i){
             batch[i] = (short) (0xFF & batchBytes[2*i]);
-            batch[i] = (short) (batch[i] | batchBytes[2*i + 1] << 8);
-            batch[i] -= 2048;
+            batch[i] = (short) (batch[i] | batchBytes[2*i + 1] << Byte.SIZE);
+            batch[i] -= TO_SIGNED;
         }
         return bytesRead/2;
     }

@@ -28,10 +28,11 @@ public class BaseMapController {
 
     /**
      * contructeur public
-     * @param tileManager le gestionnaire de tuiles à utiliser pour obtenir les tuiles de la carte
+     *
+     * @param tileManager   le gestionnaire de tuiles à utiliser pour obtenir les tuiles de la carte
      * @param mapParameters les paramètres de la portion visible de la carte
      */
-    public BaseMapController(TileManager tileManager, MapParameters mapParameters){
+    public BaseMapController(TileManager tileManager, MapParameters mapParameters) {
 
         this.tileManager = tileManager;
         this.mapParameters = mapParameters;
@@ -62,45 +63,47 @@ public class BaseMapController {
             if (currentTime < minScrollTime.get()) return;
             minScrollTime.set(currentTime + 200);
 
-            Point2D delta = canvas.sceneToLocal(e.getSceneX(),e.getSceneY());
-            mapParameters.scroll(delta.getX(),delta.getY());
+            Point2D delta = canvas.sceneToLocal(e.getSceneX(), e.getSceneY());
+            mapParameters.scroll(delta.getX(), delta.getY());
             mapParameters.changeZoomLevel(zoomDelta);
-            mapParameters.scroll(-delta.getX(),-delta.getY());
+            mapParameters.scroll(-delta.getX(), -delta.getY());
         });
 
         ObjectProperty<Point2D> start = new SimpleObjectProperty<>(null);
-        pane.setOnMousePressed(e -> start.set(new Point2D(e.getX(),e.getY())));
+        pane.setOnMousePressed(e -> start.set(new Point2D(e.getX(), e.getY())));
         pane.setOnMouseDragged(e -> {
-            mapParameters.scroll(start.get().getX()-e.getX(),start.get().getY()-e.getY());
-            start.set(new Point2D(e.getX(),e.getY()));
+            mapParameters.scroll(start.get().getX() - e.getX(), start.get().getY() - e.getY());
+            start.set(new Point2D(e.getX(), e.getY()));
         });
         pane.setOnMouseReleased(end -> start.set(null));
     }
 
     /**
      * retourne le panneau JavaFX affichant le fond de carte
+     *
      * @return le panneau JavaFX affichant le fond de carte
      */
-    public Pane pane(){
+    public Pane pane() {
         return pane;
     }
 
     /**
      * déplace la portion visible de la carte afin qu'elle soit centrée en le point donné
+     *
      * @param point le point donné
      */
-    public void centerOn(GeoPos point){
+    public void centerOn(GeoPos point) {
         double deltaX = WebMercator.x(mapParameters.zoom(), point.longitude()) - mapParameters.minX()
-                + canvas.getWidth()/2;
+                + canvas.getWidth() / 2;
         double deltaY = WebMercator.y(mapParameters.zoom(), point.latitude()) - mapParameters.minY()
-                + canvas.getHeight()/2;
-        mapParameters.scroll(deltaX,deltaY);
+                + canvas.getHeight() / 2;
+        mapParameters.scroll(deltaX, deltaY);
     }
 
     /**
      * redessinne la carte si c'est nécessaire
      */
-    private void redrawIfNeeded(){
+    private void redrawIfNeeded() {
         if (!redrawNeeded) return;
         redrawNeeded = false;
 
@@ -110,7 +113,7 @@ public class BaseMapController {
     /**
      * redessinne la carte au prochain battement
      */
-    private void redrawOnNextPulse(){
+    private void redrawOnNextPulse() {
         redrawNeeded = true;
         Platform.requestNextPulse();
     }
@@ -118,23 +121,24 @@ public class BaseMapController {
     /**
      * dessinne la carte sur le panneau
      */
-    private void draw(){
+    private void draw() {
 
         double height = canvas.getHeight();
         double width = canvas.getWidth();
-        int X = (int) Math.floor(mapParameters.minX()/256);
-        int Y = (int) Math.floor(mapParameters.minY()/256);
-        double deltaX = mapParameters.minX() - X*256;
-        double deltaY = mapParameters.minY() - Y*256;
+        int X = (int) Math.floor(mapParameters.minX() / 256);
+        int Y = (int) Math.floor(mapParameters.minY() / 256);
+        double deltaX = mapParameters.minX() - X * 256;
+        double deltaY = mapParameters.minY() - Y * 256;
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
-        for (int i = 0; i <= width+deltaX; i += 256){
-            for (int j = 0; j <= height+deltaY; j+= 256){
+        for (int i = 0; i <= width + deltaX; i += 256) {
+            for (int j = 0; j <= height + deltaY; j += 256) {
                 try {
                     Image tile = tileManager.imageForTileAt(
-                            new TileManager.TileId(mapParameters.zoom(),X + i/256, Y + j/256));
-                    graphicsContext.drawImage(tile,i-deltaX,j-deltaY);
-                } catch (IOException e) {}
+                            new TileManager.TileId(mapParameters.zoom(), X + i / 256, Y + j / 256));
+                    graphicsContext.drawImage(tile, i - deltaX, j - deltaY);
+                } catch (IOException e) {
+                }
             }
         }
     }

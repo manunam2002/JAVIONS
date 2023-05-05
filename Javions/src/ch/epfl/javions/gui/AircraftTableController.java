@@ -33,7 +33,8 @@ public class AircraftTableController {
 
     /**
      * constructeur public
-     * @param states l'ensemble des états des aéronefs qui doivent apparaître sur la vue
+     *
+     * @param states           l'ensemble des états des aéronefs qui doivent apparaître sur la vue
      * @param selectedAircraft une propriété JavaFX contenant l'état de l'aéronef sélectionné
      */
     public AircraftTableController(ObservableSet<ObservableAircraftState> states,
@@ -66,28 +67,30 @@ public class AircraftTableController {
         numberFormatPos.setMaximumFractionDigits(4);
         numberFormatPos.setMinimumFractionDigits(0);
 
-        NumberFormat numberFormatAlt = NumberFormat.getInstance();
-        numberFormatAlt.setMaximumFractionDigits(0);
-        numberFormatAlt.setMinimumFractionDigits(0);
+        NumberFormat numberFormatAltAndVel = NumberFormat.getInstance();
+        numberFormatAltAndVel.setMaximumFractionDigits(0);
+        numberFormatAltAndVel.setMinimumFractionDigits(0);
 
         TableColumn<ObservableAircraftState, String> longitudeColumn = createNumberColumn("Longitude (°)",
                 numberFormatPos, f ->
                         f.getValue().positionProperty().map(geoPos -> numberFormatPos.format(
-                        Units.convertTo(geoPos.longitude(), Units.Angle.DEGREE))));
+                                Units.convertTo(geoPos.longitude(), Units.Angle.DEGREE))));
 
         TableColumn<ObservableAircraftState, String> latitudeColumn = createNumberColumn("Latitude (°)",
                 numberFormatPos, f ->
                         f.getValue().positionProperty().map(geoPos -> numberFormatPos.format(
-                        Units.convertTo(geoPos.latitude(), Units.Angle.DEGREE))));
+                                Units.convertTo(geoPos.latitude(), Units.Angle.DEGREE))));
 
         TableColumn<ObservableAircraftState, String> altitudeColumn = createNumberColumn("Altitude (m)",
-                numberFormatAlt, f ->
-                        f.getValue().altitudeProperty().map(numberFormatAlt::format));
+                numberFormatAltAndVel, f ->
+                        f.getValue().altitudeProperty().map(numberFormatAltAndVel::format));
 
         TableColumn<ObservableAircraftState, String> velocityColumn = createNumberColumn("Vitesse (km/h)",
-                numberFormatAlt, f ->
-                        f.getValue().velocityProperty().map(v -> numberFormatAlt.format(
-                        Units.convert(v.doubleValue(), Units.Speed.METER_PER_SECOND, Units.Speed.KILOMETER_PER_HOUR))));
+                numberFormatAltAndVel, f ->
+                        f.getValue().velocityProperty().map(v -> numberFormatAltAndVel.format(
+                                Units.convert(v.doubleValue(),
+                                        Units.Speed.METER_PER_SECOND,
+                                        Units.Speed.KILOMETER_PER_HOUR))));
 
         pane.getColumns().setAll(iCAOColumn, callSignColumn, registerColumn, modelColumn, typeDesignatorColumn,
                 descriptionColumn, longitudeColumn, latitudeColumn, altitudeColumn, velocityColumn);
@@ -107,14 +110,14 @@ public class AircraftTableController {
 
         selectedAircraft.addListener((p, o, n) -> {
             pane.getSelectionModel().select(n);
-            if(!Objects.equals(o, n)) pane.scrollTo(n);
+            if (!Objects.equals(o, n)) pane.scrollTo(n);
         });
 
         pane.getSelectionModel().selectedItemProperty().addListener((p, o, n) -> selectedAircraft.set(n));
 
         pane.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2 && e.getButton() == MouseButton.PRIMARY
-                    && doubleClickConsumer != null && selectedAircraft.get() != null){
+                    && doubleClickConsumer != null && selectedAircraft.get() != null) {
                 doubleClickConsumer.accept(selectedAircraft.get());
             }
         });
@@ -122,14 +125,15 @@ public class AircraftTableController {
 
     /**
      * crée une colonne de texte à ajouter à la table
+     *
      * @param title le titre de la colonne
      * @param width la largeur préférée de la colonne
      * @param value la fonction qui définit la valeur de chaque cellule de la colonne
      * @return la colonne de texte
      */
     private TableColumn<ObservableAircraftState, String> createTextColumn(String title, int width,
-                                  Callback<TableColumn.CellDataFeatures<ObservableAircraftState, String>,
-                                          ObservableValue<String>> value){
+                                                                          Callback<TableColumn.CellDataFeatures<ObservableAircraftState, String>,
+                                                                                  ObservableValue<String>> value) {
         TableColumn<ObservableAircraftState, String> column = new TableColumn<>(title);
         column.setPrefWidth(width);
         column.setCellValueFactory(value);
@@ -138,35 +142,40 @@ public class AircraftTableController {
 
     /**
      * crée une colonne numerique à ajouter à la table
-     * @param title le titre de la colonne
+     *
+     * @param title        le titre de la colonne
      * @param numberFormat le formatteur de nombres qui permet de transformer la valeur de la cellule en une
      *                     chaine de charactères
-     * @param value la fonction qui définit la valeur de chaque cellule de la colonne
+     * @param value        la fonction qui définit la valeur de chaque cellule de la colonne
      * @return la colonne de texte
      */
-    private TableColumn<ObservableAircraftState, String> createNumberColumn(String title, NumberFormat numberFormat,
-                                   Callback<TableColumn.CellDataFeatures<ObservableAircraftState, String>,
-                                           ObservableValue<String>> value){
+    private TableColumn<ObservableAircraftState, String> createNumberColumn(
+                                            String title,
+                                            NumberFormat numberFormat,
+                                            Callback<TableColumn.CellDataFeatures<ObservableAircraftState, String>,
+                                            ObservableValue<String>> value) {
         TableColumn<ObservableAircraftState, String> column = new TableColumn<>(title);
         column.setPrefWidth(NUMERIC_COLUMN_WIDTH);
         column.getStyleClass().add("numeric");
         column.setCellValueFactory(value);
+
         column.setComparator((s1, s2) -> {
-            if(s1.isEmpty() || s2.isEmpty()) return s1.compareTo(s2);
+            if (s1.isEmpty() || s2.isEmpty()) return s1.compareTo(s2);
             try {
                 return Double.compare(numberFormat.parse(s1).doubleValue(), numberFormat.parse(s2).doubleValue());
             } catch (ParseException e) {
                 throw new Error(e);
             }
         });
+
         return column;
     }
 
-    public TableView<ObservableAircraftState> pane(){
+    public TableView<ObservableAircraftState> pane() {
         return pane;
     }
 
-    public void setOnDoubleClick(Consumer<ObservableAircraftState> consumer){
+    public void setOnDoubleClick(Consumer<ObservableAircraftState> consumer) {
         this.doubleClickConsumer = consumer;
     }
 }

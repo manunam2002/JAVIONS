@@ -29,8 +29,9 @@ public final class Bits {
     public static int extractUInt(long value, int start, int size){
         Preconditions.checkArgument(size > 0 && size < Integer.SIZE);
         Objects.checkFromIndexSize(start, size, Long.SIZE);
-        long l = value << Long.SIZE - (size + start);
-        long newValue = l >>> Long.SIZE - size;
+        long shift = Long.SIZE - (size + start);
+        long l = value << shift;
+        long newValue = l >>> shift + start;
         return (int) newValue;
     }
 

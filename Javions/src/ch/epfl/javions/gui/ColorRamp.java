@@ -37,14 +37,17 @@ public final class ColorRamp {
 
     /**
      * constructeur public
+     *
      * @param colors la séquence de couleurs spécifiant le dégradé
      * @throws IllegalArgumentException si les couleurs sont moins que deux
      */
-    public ColorRamp(Color ...colors){
+    public ColorRamp(Color... colors) {
         Preconditions.checkArgument(colors.length >= 2);
+
         size = colors.length;
         this.colors = new Color[size];
         int index = 0;
+
         for (Color color : colors) {
             this.colors[index] = color;
             ++index;
@@ -53,16 +56,19 @@ public final class ColorRamp {
 
     /**
      * retourne la couleur correspondante à l'argument
+     *
      * @param index l'agurment
      * @return la couleur correspondante
      */
-    public Color at(double index){
+    public Color at(double index) {
         if (index <= 0) return colors[0];
-        if (index >= 1) return colors[size-1];
-        double c = index * (size-1);
+        if (index >= 1) return colors[size - 1];
+
+        double c = index * (size - 1);
         int lowerIndex = (int) Math.floor(c);
-        int higherIndex = lowerIndex+1;
-        return colors[lowerIndex].interpolate(colors[higherIndex],c-lowerIndex);
+        int higherIndex = lowerIndex + 1;
+
+        return colors[lowerIndex].interpolate(colors[higherIndex], c - lowerIndex);
     }
 
 }

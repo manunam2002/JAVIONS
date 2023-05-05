@@ -20,14 +20,15 @@ public class MessageParser {
      * @return l'instance correspondant au message brut donné
      */
     public static Message parse(RawMessage rawMessage) {
-        if (rawMessage.typeCode() > 0 && rawMessage.typeCode() < 5) {
+        long typeCode = rawMessage.typeCode();
+        if (typeCode > 0 && typeCode < 5) {
             return AircraftIdentificationMessage.of(rawMessage);
         }
-        if ((rawMessage.typeCode() > 8 && rawMessage.typeCode() < 19) ||
-                (rawMessage.typeCode() > 19 && rawMessage.typeCode() < 23)) {
+        if ((typeCode > 8 && typeCode < 19) ||
+                (typeCode > 19 && typeCode < 23)) {
             return AirbornePositionMessage.of(rawMessage);
         }
-        if (rawMessage.typeCode() == 19) {
+        if (typeCode == 19) {
             return AirborneVelocityMessage.of(rawMessage);
         }
         return null;

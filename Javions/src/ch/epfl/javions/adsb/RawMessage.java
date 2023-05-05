@@ -1,5 +1,6 @@
 package ch.epfl.javions.adsb;
 
+import ch.epfl.javions.Bits;
 import ch.epfl.javions.ByteString;
 import ch.epfl.javions.Crc24;
 import ch.epfl.javions.Preconditions;
@@ -23,6 +24,10 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
     public static final int LENGTH = 14;
 
     private final static Crc24 CRC_24 = new Crc24(Crc24.GENERATOR);
+
+    private static final int DF_VALUE = 17;
+
+    private static final HexFormat HEX_FORMAT = HexFormat.of().withUpperCase();
 
     /**
      * constructeur compact
@@ -52,7 +57,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return la taille d'un message
      */
     public static int size(byte byte0){
-        return (( (byte0 >>> 3) & 0x1F) == 17) ? LENGTH : 0;
+        return (Bits.extractUInt(byte0, 3, 5) == DF_VALUE) ? LENGTH : 0;
     }
 
     /**
@@ -61,7 +66,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return le code de type
      */
     public static int typeCode(long payload){
-        long typeCode = (payload >>> 51) & 0x1F;
+        long typeCode = Bits.extractUInt(payload, 51, 5);
         return (int) typeCode;
     }
 
@@ -79,7 +84,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      */
     public IcaoAddress icaoAddress(){
         int iCAO = (int) bytes.bytesInRange(1,4);
-        return new IcaoAddress(HexFormat.of().withUpperCase().toHexDigits(iCAO, 6));
+        return new IcaoAddress(HEX_FORMAT.toHexDigits(iCAO, 6));
     }
 
     /**

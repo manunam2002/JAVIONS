@@ -14,6 +14,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public final class AircraftDatabase {
 
+    private final static String REGEX = ",";
+
     private final String fileName;
 
     /**
@@ -23,8 +25,7 @@ public final class AircraftDatabase {
      * @throws NullPointerException si le paramètre est nul
      */
     public AircraftDatabase(String fileName){
-        Objects.requireNonNull(fileName);
-        this.fileName = fileName;
+        this.fileName = Objects.requireNonNull(fileName);
     }
 
     /**
@@ -49,8 +50,7 @@ public final class AircraftDatabase {
             }
             String[] aircraftData;
             if (comparator == 0) {
-                String regex = ",";
-                aircraftData = line.split(regex, -1);
+                aircraftData = line.split(REGEX, -1);
             } else {
                 return null;
             }

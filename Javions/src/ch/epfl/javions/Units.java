@@ -13,14 +13,8 @@ public final class Units {
      */
     private Units(){}
 
-    /**
-     * centi
-     */
     public static final double CENTI = 1e-2;
 
-    /**
-     * kilo
-     */
     public static final double KILO = 1e3;
 
     /**
@@ -33,24 +27,12 @@ public final class Units {
          */
         private Angle(){}
 
-        /**
-         * radian
-         */
         public static final double RADIAN = 1;
 
-        /**
-         * turn
-         */
         public static final double TURN = 2*Math.PI*RADIAN;
 
-        /**
-         * degrée
-         */
         public static final double DEGREE = TURN/360;
 
-        /**
-         * t32
-         */
         public static final double T32 = Math.scalb(TURN,-32);
     }
 
@@ -64,34 +46,16 @@ public final class Units {
          */
         private Length(){}
 
-        /**
-         * mètre
-         */
         public static final double METER = 1;
 
-        /**
-         * centimètre
-         */
         public static final double CENTIMETER = CENTI*METER;
 
-        /**
-         * kilomètre
-         */
         public static final double KILOMETER = KILO*METER;
 
-        /**
-         * pouce
-         */
         public static final double INCH = 2.54*CENTIMETER;
 
-        /**
-         * pied
-         */
         public static final double FOOT = 12*INCH;
 
-        /**
-         * mile nautique
-         */
         public static final double NAUTICAL_MILE = 1852*METER;
     }
 
@@ -105,19 +69,10 @@ public final class Units {
          */
         private Time(){}
 
-        /**
-         * seconde
-         */
         public static final double SECOND = 1;
 
-        /**
-         * minute
-         */
         public static final double MINUTE = 60*SECOND;
 
-        /**
-         * heure
-         */
         public static final double HOUR = 60*MINUTE;
     }
 
@@ -131,19 +86,11 @@ public final class Units {
          */
         private Speed(){}
 
-        /**
-         * mètre par seconde
-         */
+        //à verifier
         public static final double METER_PER_SECOND = Length.METER/Time.SECOND;
 
-        /**
-         * noeud
-         */
         public static final double KNOT = Length.NAUTICAL_MILE/Time.HOUR;
 
-        /**
-         * kilomètre par heure
-         */
         public static final double KILOMETER_PER_HOUR = Length.KILOMETER/Time.HOUR;
     }
 

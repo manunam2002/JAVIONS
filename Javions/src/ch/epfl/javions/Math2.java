@@ -23,8 +23,7 @@ public final class Math2 {
      */
     public static int clamp(int min, int v, int max){
         Preconditions.checkArgument(min <= max);
-        if (v < min) return min;
-        return Math.min(v,max);
+        return Math.min(Math.max(v, min),max);
     }
 
     /**
@@ -33,6 +32,6 @@ public final class Math2 {
      * @return sinus hyperbolique réciproque de son argument x
      */
     public static double asinh(double x){
-        return Math.log(x + Math.sqrt( 1 + x*x ));
+        return Math.log(x + Math.hypot(1, x));
     }
 }

@@ -150,6 +150,5 @@ class AirbornePositionMessageTest {
     void getterisAutomatic(){
         AirbornePositionMessage airbornePositionMessage = AirbornePositionMessage.of(new RawMessage(0, ByteString.ofHexadecimalString("8D406666580D1652395CBE0A4D3E")));
         System.out.println(airbornePositionMessage.altitude());
-
     }
 }

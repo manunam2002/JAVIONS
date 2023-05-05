@@ -20,17 +20,17 @@ public final class PowerWindow {
 
     private final PowerComputer powerComputer;
 
-    private int[] Batch1;
+    private int[] batch1;
 
-    private final int[] Batch2;
+    private int[] batch2;
 
-    private int position = 0;
+    private int position;
 
-    private int currentBatch = 0;
+    private int currentBatch;
 
     private final static int BATCH_SIZE = 65536;
 
-    private int batchRead = 0;
+    private int batchRead;
 
     /**
      * constructeur public
@@ -44,9 +44,12 @@ public final class PowerWindow {
         Preconditions.checkArgument(windowSize > 0 && windowSize <= BATCH_SIZE);
         this.windowSize = windowSize;
         powerComputer = new PowerComputer(stream, BATCH_SIZE);
-        Batch1 = new int[BATCH_SIZE];
-        Batch2 = new int[BATCH_SIZE];
-        batchRead += powerComputer.readBatch(Batch1);
+        batch1 = new int[BATCH_SIZE];
+        batch2 = new int[BATCH_SIZE];
+        batchRead = 0;
+        batchRead += powerComputer.readBatch(batch1);
+        position = 0;
+        currentBatch = 0;
     }
 
     /**
@@ -83,7 +86,7 @@ public final class PowerWindow {
     public int get(int i){
         Objects.checkIndex(i,windowSize);
         int index = position + i - currentBatch*BATCH_SIZE;
-        return (index >= BATCH_SIZE) ? Batch2[index - BATCH_SIZE] : Batch1[index];
+        return (index >= BATCH_SIZE) ? batch2[index - BATCH_SIZE] : batch1[index];
     }
 
     /**
@@ -93,10 +96,12 @@ public final class PowerWindow {
     public void advance() throws IOException{
         ++position;
         if (position + windowSize == BATCH_SIZE * (currentBatch + 1)){
-            batchRead += powerComputer.readBatch(Batch2);
+            batchRead += powerComputer.readBatch(batch2);
         }
         if (position == BATCH_SIZE * (currentBatch + 1)){
-            Batch1 = Arrays.copyOf(Batch2, BATCH_SIZE);
+            int[] temp = batch1;
+            batch1 = batch2;
+            batch2 = temp;
             ++currentBatch;
         }
     }

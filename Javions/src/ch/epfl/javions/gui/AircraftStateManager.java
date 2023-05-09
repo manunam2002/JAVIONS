@@ -84,8 +84,14 @@ public final class AircraftStateManager {
      * n'a été reçu dans la minute précédant la réception du dernier message mis à jour
      */
     public void purge() {
-        observableAircraftStates.removeIf(observableAircraftState ->
-                observableAircraftState.getLastMessageTimeStampNs() - lastMessageTimeStampNs
-                        >= Units.Time.MINUTE * 10E9);
+
+        observableAircraftStates.forEach(observableAircraftState -> {
+            if (observableAircraftState.getLastMessageTimeStampNs() - lastMessageTimeStampNs
+                    >= (long)Units.Time.MINUTE * 10E9){
+                observableAircraftStates.remove(observableAircraftState);
+                map.remove(observableAircraftState.getIcaoAddress());
+            }
+        });
+
     }
 }

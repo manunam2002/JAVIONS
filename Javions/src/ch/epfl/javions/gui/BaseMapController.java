@@ -93,10 +93,10 @@ public class BaseMapController {
      * @param point le point donné
      */
     public void centerOn(GeoPos point) {
-        double deltaX = WebMercator.x(mapParameters.zoom(), point.longitude()) - mapParameters.minX()
-                + canvas.getWidth() / 2;
-        double deltaY = WebMercator.y(mapParameters.zoom(), point.latitude()) - mapParameters.minY()
-                + canvas.getHeight() / 2;
+        double deltaX = WebMercator.x(mapParameters.zoom(), point.longitude()) - (mapParameters.minX()
+                + (canvas.getWidth()/2));
+        double deltaY = WebMercator.y(mapParameters.zoom(), point.latitude()) - (mapParameters.minY()
+                + (canvas.getHeight()/2));
         mapParameters.scroll(deltaX, deltaY);
     }
 

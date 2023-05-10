@@ -12,6 +12,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
@@ -21,14 +22,38 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.lang.Thread.sleep;
 
+/**
+ * contient le programme principal
+ *
+ * @author Manu Cristini (358484)
+ * @author Youssef Esseddik (346488)
+ */
 public final class Main extends Application {
 
-    public static void main(String[] args) { launch(args); }
+    /**
+     * appelle launch avec les arguments du programme
+     *
+     * @param args les arguments du programme
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
 
+    /**
+     * démarre l'application en construisant le graphe de scène correspondant à l'interface graphique,
+     * démarrant le fil d'exécution chargé d'obtenir les messages, et enfin démarrant le minuteur d'animation
+     * chargé de mettre à jour les états d'aéronefs en fonction des messages reçus
+     *
+     * @param primaryStage la scène principale de cette application
+     *
+     * @throws RuntimeException en cas d'erreur d'entrée/sortie ou en cas d'interruption du fil d'execution
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -41,7 +66,7 @@ public final class Main extends Application {
 
         TileManager tm = new TileManager(tileCache, "tile.openstreetmap.org");
 
-        MapParameters mp = new MapParameters(8,33_530,23_070);
+        MapParameters mp = new MapParameters(8, 33_530, 23_070);
 
         BaseMapController bmc = new BaseMapController(tm, mp);
 
@@ -52,6 +77,7 @@ public final class Main extends Application {
         AircraftController ac = new AircraftController(mp, asm.states(), sap);
 
         AircraftTableController atc = new AircraftTableController(asm.states(), sap);
+        atc.setOnDoubleClick(s -> bmc.centerOn(s.getPosition()));
 
         StatusLineController slc = new StatusLineController();
         slc.aircraftCountProperty().bind(Bindings.size(asm.states()));
@@ -64,6 +90,7 @@ public final class Main extends Application {
         borderPane.topProperty().set(slc.pane());
 
         SplitPane splitPane = new SplitPane(stackPane, borderPane);
+        splitPane.orientationProperty().set(Orientation.VERTICAL);
 
         primaryStage.setTitle("Javions");
         primaryStage.setScene(new Scene(splitPane));
@@ -75,48 +102,35 @@ public final class Main extends Application {
 
         ConcurrentLinkedQueue<Message> queue = new ConcurrentLinkedQueue<>();
 
-        if (getParameters().getRaw().isEmpty()){
-            AdsbDemodulator demodulator = new AdsbDemodulator(System.in);
-            thread = new Thread(() -> {
-                try {
-                    Message m = MessageParser.parse(demodulator.nextMessage());
-                    if (m != null){
-                        queue.add(m);
-                        mcp.set(mcp.get() + 1);
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        } else {
-            String file = getParameters().getRaw().get(0);
-            URL url = getClass().getResource(file);
-            assert url != null;
-            Path path = Path.of(u.toURI());
+        if (getParameters().getRaw().isEmpty()) {
 
             thread = new Thread(() -> {
-                try (DataInputStream s = new DataInputStream(
-                        new BufferedInputStream(
-                                new FileInputStream(path.toString())))) {
-                    byte[] bytes = new byte[RawMessage.LENGTH];
-                    while (true) {
-                        long timeStampNs = s.readLong();
-                        int bytesRead = s.readNBytes(bytes, 0, bytes.length);
-                        assert bytesRead == RawMessage.LENGTH;
-                        ByteString message = new ByteString(bytes);
-                        RawMessage rawMessage = new RawMessage(timeStampNs, message);
-                        Message m = MessageParser.parse(rawMessage);
-                        if (m != null){
-                            if (System.nanoTime() < m.timeStampNs()){
-                                sleep(m.timeStampNs() - System.nanoTime());
-                            }
+                try {
+                    AdsbDemodulator demodulator = new AdsbDemodulator(System.in);
+                    RawMessage rm;
+                    while ((rm = demodulator.nextMessage()) != null) {
+                        Message m = MessageParser.parse(rm);
+                        if (m != null) {
                             queue.add(m);
-                            mcp.set(mcp.get() + 1);
                         }
                     }
-                } catch (IOException e){
-                    return;
-                } catch (InterruptedException e) {
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+
+        } else {
+
+            thread = new Thread(() -> {
+                String file = getParameters().getRaw().get(0);
+                try {
+                    for (Message m : readAllMessages(file)) {
+                        if (System.nanoTime() < m.timeStampNs()) {
+                            sleep(m.timeStampNs() - System.nanoTime());
+                        }
+                        queue.add(m);
+                    }
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             });
@@ -131,10 +145,41 @@ public final class Main extends Application {
                 if (queue.isEmpty()) return;
                 try {
                     asm.updateWithMessage(queue.remove());
+                    mcp.set(mcp.get() + 1);
+                    asm.purge();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         }.start();
+    }
+
+    /**
+     * lit tous les messages depuis un fichier et les retourne dans une liste
+     *
+     * @param fileName le nom du fichier
+     * @return la liste des messages
+     * @throws IOException en cas d'erreur d'entrée/sortie
+     */
+    private static List<Message> readAllMessages(String fileName) throws IOException {
+        List<Message> l = new ArrayList<>();
+        try (DataInputStream s = new DataInputStream(
+                new BufferedInputStream(
+                        new FileInputStream(fileName)))) {
+            byte[] bytes = new byte[RawMessage.LENGTH];
+            while (true) {
+                long timeStampNs = s.readLong();
+                int bytesRead = s.readNBytes(bytes, 0, bytes.length);
+                assert bytesRead == RawMessage.LENGTH;
+                ByteString message = new ByteString(bytes);
+                RawMessage rawMessage = new RawMessage(timeStampNs, message);
+                Message m = MessageParser.parse(rawMessage);
+                if (m != null) {
+                    l.add(m);
+                }
+            }
+        } catch (EOFException e) {
+            return l;
+        }
     }
 }

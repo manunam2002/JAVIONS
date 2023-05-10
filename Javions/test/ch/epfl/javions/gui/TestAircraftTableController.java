@@ -18,6 +18,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public final class TestAircraftTableController extends Application {
     public static void main(String[] args) { launch(args); }
@@ -45,11 +46,6 @@ public final class TestAircraftTableController extends Application {
     public void start(Stage primaryStage) throws Exception {
         // … à compléter (voir TestBaseMapController)
         Path tileCache = Path.of("/Users/manucristini/EPFLBA2/CS108/Projets/cache");
-        TileManager tm =
-                new TileManager(tileCache, "tile.openstreetmap.org");
-        MapParameters mp =
-                new MapParameters(17,17_389_327,11_867_430);
-        BaseMapController bmc = new BaseMapController(tm, mp);
 
         // Création de la base de données
         URL dbUrl = getClass().getResource("/aircraft.zip");
@@ -63,12 +59,12 @@ public final class TestAircraftTableController extends Application {
         AircraftTableController atc =
                 new AircraftTableController(asm.states(), sap);
         atc.setOnDoubleClick(s -> System.out.println(s.getIcaoAddress().string()));
-        var root = new StackPane(bmc.pane(), atc.pane());
+        var root = new StackPane(atc.pane());
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
 
-        var mi =
-                readAllMessages("/Users/manucristini/EPFLBA2/CS108/Projets/Javions/resources/messages_20230318_0915.bin")
+        List<RawMessage> l = readAllMessages("/Users/manucristini/EPFLBA2/CS108/Projets/Javions/resources/messages_20230318_0915.bin");
+        var mi = l/*.subList(l.size()-6000, l.size())*/
                         .iterator();
 
         // Animation des aéronefs
@@ -77,8 +73,12 @@ public final class TestAircraftTableController extends Application {
             public void handle(long now) {
                 try {
                     for (int i = 0; i < 10; i += 1) {
-                        Message m = MessageParser.parse(mi.next());
-                        if (m != null) asm.updateWithMessage(m);
+                        try {
+                            Message m = MessageParser.parse(mi.next());
+                            if (m != null) asm.updateWithMessage(m);
+                        } catch (NoSuchElementException e) {
+
+                        }
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);

@@ -67,7 +67,7 @@ public final class TestAircraftController extends Application {
         primaryStage.show();
 
         var mi =
-                readAllMessages("/Users/manucristini/EPFLBA2/CS108/Projets/Javions/resources/messages_20230318_0915.bin")
+                readAllMessages("messages_20230318_0915.bin")
                 .iterator();
 
         // Animation des aéronefs
@@ -78,6 +78,7 @@ public final class TestAircraftController extends Application {
                     for (int i = 0; i < 10; i += 1) {
                         Message m = MessageParser.parse(mi.next());
                         if (m != null) asm.updateWithMessage(m);
+                        asm.purge();
                     }
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);

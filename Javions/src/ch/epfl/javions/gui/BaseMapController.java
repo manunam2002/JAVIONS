@@ -20,6 +20,7 @@ import java.io.IOException;
  */
 public class BaseMapController {
 
+    private static final int TILE_PIXELS = 256;
     private final TileManager tileManager;
     private final MapParameters mapParameters;
     private boolean redrawNeeded;
@@ -43,6 +44,7 @@ public class BaseMapController {
         canvas.heightProperty().bind(pane.heightProperty());
 
         canvas.widthProperty().addListener((p, o, n) -> redrawOnNextPulse());
+        // if (o != n) ??
         canvas.heightProperty().addListener((p, o, n) -> redrawOnNextPulse());
 
         mapParameters.zoomProperty().addListener((p, o, n) -> redrawOnNextPulse());
@@ -70,6 +72,7 @@ public class BaseMapController {
         });
 
         ObjectProperty<Point2D> start = new SimpleObjectProperty<>(null);
+
         pane.setOnMousePressed(e -> start.set(new Point2D(e.getX(), e.getY())));
         pane.setOnMouseDragged(e -> {
             mapParameters.scroll(start.get().getX() - e.getX(), start.get().getY() - e.getY());
@@ -123,20 +126,20 @@ public class BaseMapController {
      */
     private void draw() {
 
-        double height = canvas.getHeight();
-        double width = canvas.getWidth();
-        int X = (int) Math.floor(mapParameters.minX() / 256);
-        int Y = (int) Math.floor(mapParameters.minY() / 256);
-        double deltaX = mapParameters.minX() - X * 256;
-        double deltaY = mapParameters.minY() - Y * 256;
+        int X = (int) Math.floor(mapParameters.minX() / TILE_PIXELS);
+        int Y = (int) Math.floor(mapParameters.minY() / TILE_PIXELS);
+        double deltaX = mapParameters.minX() - X * TILE_PIXELS;
+        double deltaY = mapParameters.minY() - Y * TILE_PIXELS;
+        double height = (canvas.getHeight() + deltaY)/ TILE_PIXELS;
+        double width = (canvas.getWidth() + deltaX)/ TILE_PIXELS;
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
-        for (int i = 0; i <= width + deltaX; i += 256) {
-            for (int j = 0; j <= height + deltaY; j += 256) {
+        for (int i = 0; i <= width; i += 1) {
+            for (int j = 0; j <= height; j += 1) {
                 try {
                     Image tile = tileManager.imageForTileAt(
-                            new TileManager.TileId(mapParameters.zoom(), X + i / 256, Y + j / 256));
-                    graphicsContext.drawImage(tile, i - deltaX, j - deltaY);
+                            new TileManager.TileId(mapParameters.zoom(), X + i, Y + j));
+                    graphicsContext.drawImage(tile, i* TILE_PIXELS - deltaX, j* TILE_PIXELS - deltaY);
                 } catch (IOException e) {
                 }
             }

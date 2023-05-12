@@ -106,29 +106,30 @@ public final class AircraftController {
         trajectory.getStyleClass().add("trajectory");
         aircraftGroup.getChildren().add(trajectory);
 
-        trajectory.visibleProperty().bind(Bindings.createBooleanBinding(() ->
-                        selectedAircraft.get() != null &&
-                                selectedAircraft.get().equals(aircraftState),
-                selectedAircraft));
+        trajectory.layoutXProperty().bind(mapParameters.minXProperty().negate());
+        trajectory.layoutYProperty().bind(mapParameters.minYProperty().negate());
+
+        trajectory.visibleProperty().bind(Bindings.equal(aircraftState, selectedAircraft));
         trajectory.visibleProperty().addListener((p, o, n) -> {
             if (!o && n) createTrajectory(aircraftState, trajectory);
             if (o && !n) trajectory.getChildren().clear();
         });
 
+        // à verifier -> optimisation
         aircraftState.getTrajectory().addListener((ListChangeListener<ObservableAircraftState.AirbornePos>) change -> {
-            if (selectedAircraft.get() != null &&
-                    change.next() && change.wasAdded() &&
-                    selectedAircraft.get().equals(aircraftState)) {
+            if (aircraftState.equals(selectedAircraft.get()) &&
+                    change.next() && change.wasAdded()) {
                 int index = aircraftState.getTrajectory().size() - 1;
                 ObservableAircraftState.AirbornePos start = aircraftState.getTrajectory().get(index - 1);
                 ObservableAircraftState.AirbornePos end = aircraftState.getTrajectory().get(index);
                 addLineToTrajectory(start, end, trajectory);
+
             }
         });
+
         mapParameters.zoomProperty().addListener((p, o, n) -> {
-            if (selectedAircraft.get() != null &&
-                    o.intValue() != n.intValue() &&
-                    selectedAircraft.get().equals(aircraftState))
+            if (aircraftState.equals(selectedAircraft.get()) &&
+                    o.intValue() != n.intValue())
                 createTrajectory(aircraftState, trajectory);
         });
     }
@@ -166,8 +167,6 @@ public final class AircraftController {
         double endY = WebMercator.y(mapParameters.zoom(), end.position().latitude());
 
         Line line = new Line(startX, startY, endX, endY);
-        line.layoutXProperty().bind(mapParameters.minXProperty().negate());
-        line.layoutYProperty().bind(mapParameters.minYProperty().negate());
 
         if (start.altitude() == end.altitude()) {
             line.setStroke(plasmaAt(end.altitude()));

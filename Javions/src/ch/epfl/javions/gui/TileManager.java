@@ -23,8 +23,7 @@ public final class TileManager {
 
     private final Path path;
     private final String serverName;
-
-    private final Map<TileId, Image> cache = new LinkedHashMap<>(100, 1, false);
+    private final Map<TileId, Image> cache;
 
     /**
      * constructeur public
@@ -35,6 +34,7 @@ public final class TileManager {
     public TileManager(Path path, String serverName) {
         this.path = path;
         this.serverName = serverName;
+        cache = new LinkedHashMap<>(100, 1, false);
     }
 
     /**
@@ -55,9 +55,8 @@ public final class TileManager {
         Path tilePath = Path.of(path.toString() + "/" + tile.zoom + "/" + tile.x + "/" + tile.y + ".png");
         // constantes ?
         if (Files.exists(tilePath)) {
-            try (FileInputStream s = new FileInputStream(tilePath.toString())) {
-                byte[] imageBytes = s.readAllBytes();
-                return new Image(new ByteArrayInputStream(imageBytes));
+            try (FileInputStream fis = new FileInputStream(tilePath.toString())) {
+                return new Image(new ByteArrayInputStream(fis.readAllBytes()));
             }
         }
 
@@ -108,7 +107,7 @@ public final class TileManager {
          */
         public static boolean isValid(int zoom, int x, int y) {
             int max = 1 << zoom;
-            return x >= 0 && x < max && y >= 0 && y < max;
+            return 0 <= x && x < max && 0 <= y && y < max;
         }
     }
 }

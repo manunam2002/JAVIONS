@@ -9,6 +9,8 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.Objects;
+
 import static java.lang.Double.NaN;
 
 /**
@@ -21,16 +23,15 @@ public final class ObservableAircraftState implements AircraftStateSetter {
 
     private final IcaoAddress icaoAddress;
     private final AircraftData aircraftData;
-    private final LongProperty lastMessageTimeStampNs = new SimpleLongProperty(0);
-    private final IntegerProperty category = new SimpleIntegerProperty(0);
-    private final ObjectProperty<CallSign> callSign = new SimpleObjectProperty<>(null);
-    private final ObjectProperty<GeoPos> position = new SimpleObjectProperty<>(null);
-    private final DoubleProperty altitude = new SimpleDoubleProperty(NaN);
-    private final DoubleProperty velocity = new SimpleDoubleProperty(NaN);
-    private final DoubleProperty trackOrHeading = new SimpleDoubleProperty(NaN);
-    private final ObservableList<AirbornePos> observableTrajectory = FXCollections.observableArrayList();
-    private final ObservableList<AirbornePos> unmodifiableTrajectory =
-            FXCollections.unmodifiableObservableList(observableTrajectory);
+    private final LongProperty lastMessageTimeStampNs;
+    private final IntegerProperty category;
+    private final ObjectProperty<CallSign> callSign;
+    private final ObjectProperty<GeoPos> position;
+    private final DoubleProperty altitude;
+    private final DoubleProperty velocity;
+    private final DoubleProperty trackOrHeading;
+    private final ObservableList<AirbornePos> observableTrajectory;
+    private final ObservableList<AirbornePos> unmodifiableTrajectory;
     private long lastPositionMessageTimeStampNs;
 
     /**
@@ -40,8 +41,17 @@ public final class ObservableAircraftState implements AircraftStateSetter {
      * @param aircraftData les caractéristiques fixes de cet aéronef
      */
     public ObservableAircraftState(IcaoAddress icaoAddress, AircraftData aircraftData) {
-        this.icaoAddress = icaoAddress;
+        this.icaoAddress = Objects.requireNonNull(icaoAddress);
         this.aircraftData = aircraftData;
+        lastMessageTimeStampNs = new SimpleLongProperty(0);
+        category = new SimpleIntegerProperty(0);
+        callSign = new SimpleObjectProperty<>(null);
+        position = new SimpleObjectProperty<>(null);
+        altitude = new SimpleDoubleProperty(NaN);
+        velocity = new SimpleDoubleProperty(NaN);
+        trackOrHeading = new SimpleDoubleProperty(NaN);
+        observableTrajectory = FXCollections.observableArrayList();
+        unmodifiableTrajectory = FXCollections.unmodifiableObservableList(observableTrajectory);
     }
 
     /**
@@ -60,15 +70,6 @@ public final class ObservableAircraftState implements AircraftStateSetter {
      */
     public AircraftData getAircraftData() {
         return aircraftData;
-    }
-
-    /**
-     * enregistrement public qui représénte des positions dans l'éspace
-     *
-     * @param position la position de l'aéronef
-     * @param altitude l'altitude de l'aéronef
-     */
-    public record AirbornePos(GeoPos position, double altitude) {
     }
 
     /**
@@ -219,7 +220,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     public void setAltitude(double altitude) {
         this.altitude.set(altitude);
 
-        if (position.get() != null) {
+        if (Objects.nonNull(position.get())) {
             if (observableTrajectory.isEmpty()){
                 observableTrajectory.add(new AirbornePos(getPosition(), altitude));
                 lastPositionMessageTimeStampNs = getLastMessageTimeStampNs();
@@ -294,4 +295,12 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     public ObservableList<AirbornePos> getTrajectory() {
         return unmodifiableTrajectory;
     }
+
+    /**
+     * enregistrement public qui représénte des positions dans l'éspace
+     *
+     * @param position la position de l'aéronef
+     * @param altitude l'altitude de l'aéronef
+     */
+    public record AirbornePos(GeoPos position, double altitude) {}
 }

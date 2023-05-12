@@ -1,6 +1,5 @@
 package ch.epfl.javions.gui;
 
-import ch.epfl.javions.Units;
 import ch.epfl.javions.adsb.AircraftStateAccumulator;
 import ch.epfl.javions.adsb.Message;
 import ch.epfl.javions.aircraft.AircraftDatabase;
@@ -9,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -19,15 +19,12 @@ import java.util.*;
  */
 public final class AircraftStateManager {
 
-    private final Map<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> map = new HashMap<>();
-
-    private final ObservableSet<ObservableAircraftState> observableAircraftStates = FXCollections.observableSet();
-    private final ObservableSet<ObservableAircraftState> unmodifiableObservableAircraftStates =
-            FXCollections.unmodifiableObservableSet(observableAircraftStates);
-
+    private final Map<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> map;
+    private final ObservableSet<ObservableAircraftState> observableAircraftStates;
+    private final ObservableSet<ObservableAircraftState> unmodifiableObservableAircraftStates;
     private final AircraftDatabase aircraftDatabase;
-
     private long lastMessageTimeStampNs;
+    private static final long MINUTE_IN_NANOS = Duration.ofMinutes(1).toNanos();
 
     /**
      * constructeur public
@@ -36,6 +33,9 @@ public final class AircraftStateManager {
      */
     public AircraftStateManager(AircraftDatabase aircraftDatabase) {
         this.aircraftDatabase = aircraftDatabase;
+        map = new HashMap<>();
+        observableAircraftStates = FXCollections.observableSet();
+        unmodifiableObservableAircraftStates = FXCollections.unmodifiableObservableSet(observableAircraftStates);
     }
 
     /**
@@ -61,17 +61,19 @@ public final class AircraftStateManager {
         if (map.containsKey(icaoAddress)) {
             map.get(icaoAddress).update(message);
             ObservableAircraftState aircraftState = map.get(icaoAddress).stateSetter();
-            if (aircraftState.getPosition() != null) {
+            // duplication de code?? - ligne 75
+            if (Objects.nonNull(aircraftState.getPosition())) {
                 observableAircraftStates.add(aircraftState);
             }
         } else {
             AircraftStateAccumulator<ObservableAircraftState> aircraftStateAccumulator =
-                    new AircraftStateAccumulator<>(new ObservableAircraftState
-                            (icaoAddress, aircraftDatabase.get(icaoAddress)));
+                    new AircraftStateAccumulator<>(
+                            new ObservableAircraftState(icaoAddress, aircraftDatabase.get(icaoAddress))
+                    );
             aircraftStateAccumulator.update(message);
             ObservableAircraftState aircraftState = aircraftStateAccumulator.stateSetter();
             map.put(icaoAddress, aircraftStateAccumulator);
-            if (aircraftState.getPosition() != null) {
+            if (Objects.nonNull(aircraftState.getPosition())) {
                 observableAircraftStates.add(aircraftState);
             }
         }
@@ -84,14 +86,16 @@ public final class AircraftStateManager {
      * n'a été reçu dans la minute précédant la réception du dernier message mis à jour
      */
     public void purge() {
+        Iterator<Map.Entry<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>>> it =
+                map.entrySet().iterator();
 
-        observableAircraftStates.forEach(observableAircraftState -> {
-            if (observableAircraftState.getLastMessageTimeStampNs() - lastMessageTimeStampNs
-                    >= (long)Units.Time.MINUTE * 10E9){
-                observableAircraftStates.remove(observableAircraftState);
-                map.remove(observableAircraftState.getIcaoAddress());
+        while (it.hasNext()) {
+            Map.Entry<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> entry = it.next();
+            ObservableAircraftState state = entry.getValue().stateSetter();
+            if(lastMessageTimeStampNs - state.getLastMessageTimeStampNs() >= MINUTE_IN_NANOS){
+                it.remove();
+                observableAircraftStates.remove(state);
             }
-        });
-
+        }
     }
 }

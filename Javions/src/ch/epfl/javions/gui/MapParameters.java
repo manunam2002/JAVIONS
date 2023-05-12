@@ -24,7 +24,7 @@ public class MapParameters {
      * @param minY la coordonnée y du coin haut-gauche de la portion visible de la carte
      */
     public MapParameters(int zoom, int minX, int minY) {
-        Preconditions.checkArgument(zoom >= 6 && zoom <= 19);
+        Preconditions.checkArgument(6 <= zoom && zoom <= 19);
 
         this.zoom = new SimpleIntegerProperty(zoom);
         this.minX = new SimpleDoubleProperty(minX);
@@ -104,6 +104,7 @@ public class MapParameters {
     public void changeZoomLevel(int delta) {
         int clampedDelta = Math2.clamp(6 - zoom(), delta, 19 - zoom());
         if (clampedDelta == 0) return;
+        // à verifier
 
         zoom.set(zoom() + clampedDelta);
         minX.set(Math.scalb(minX(), clampedDelta));

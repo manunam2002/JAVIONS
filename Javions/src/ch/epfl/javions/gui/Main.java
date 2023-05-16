@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -35,6 +36,9 @@ import static java.lang.Thread.sleep;
  * @author Youssef Esseddik (346488)
  */
 public final class Main extends Application {
+
+    private final static long SECOND = Duration.ofSeconds(1).toNanos();
+    private long lastPurge;
 
     /**
      * appelle launch avec les arguments du programme
@@ -85,9 +89,7 @@ public final class Main extends Application {
 
         StackPane stackPane = new StackPane(bmc.pane(), ac.pane());
 
-        BorderPane borderPane = new BorderPane();
-        borderPane.centerProperty().set(atc.pane());
-        borderPane.topProperty().set(slc.pane());
+        BorderPane borderPane = new BorderPane(atc.pane(), slc.pane(), null, null, null);
 
         SplitPane splitPane = new SplitPane(stackPane, borderPane);
         splitPane.orientationProperty().set(Orientation.VERTICAL);
@@ -122,11 +124,12 @@ public final class Main extends Application {
         } else {
 
             thread = new Thread(() -> {
+                long start = System.nanoTime();
                 String file = getParameters().getRaw().get(0);
                 try {
                     for (Message m : readAllMessages(file)) {
-                        if (System.nanoTime() < m.timeStampNs()) {
-                            sleep(m.timeStampNs() - System.nanoTime());
+                        if ((System.nanoTime() - start) < m.timeStampNs()) {
+                            sleep(Duration.ofNanos(m.timeStampNs() + start - System.nanoTime()).toMillis());
                         }
                         queue.add(m);
                     }
@@ -136,19 +139,26 @@ public final class Main extends Application {
             });
         }
 
+        thread.setDaemon(true);
         thread.start();
+
+        lastPurge = 0;
 
 
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (queue.isEmpty()) return;
-                try {
-                    asm.updateWithMessage(queue.remove());
-                    mcp.set(mcp.get() + 1);
-                    asm.purge();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                while (!queue.isEmpty()) {
+                    try {
+                        asm.updateWithMessage(queue.remove());
+                        mcp.set(mcp.get() + 1);
+                        if (now - lastPurge >= SECOND){
+                            asm.purge();
+                            lastPurge = now;
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }.start();

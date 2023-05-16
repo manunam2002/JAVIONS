@@ -45,7 +45,7 @@ public class AircraftTableController {
         pane.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         pane.setTableMenuButtonVisible(true);
 
-        TableColumn<ObservableAircraftState, String> iCAOColumn = createTextColumn("OACI", 60,
+        TableColumn<ObservableAircraftState, String> iCAOColumn = createTextColumn("OACI", 60, //constantes?
                 f -> new ReadOnlyStringWrapper(f.getValue().getIcaoAddress().string()));
 
         TableColumn<ObservableAircraftState, String> callSignColumn = createTextColumn("Indicatif", 70,
@@ -110,14 +110,14 @@ public class AircraftTableController {
 
         selectedAircraft.addListener((p, o, n) -> {
             pane.getSelectionModel().select(n);
-            if (!Objects.equals(o, n)) pane.scrollTo(n);
+            pane.scrollTo(n);
         });
 
         pane.getSelectionModel().selectedItemProperty().addListener((p, o, n) -> selectedAircraft.set(n));
 
         pane.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2 && e.getButton() == MouseButton.PRIMARY
-                    && doubleClickConsumer != null && selectedAircraft.get() != null) {
+                    && Objects.nonNull(doubleClickConsumer) && Objects.nonNull(selectedAircraft.get())) {
                 doubleClickConsumer.accept(selectedAircraft.get());
             }
         });

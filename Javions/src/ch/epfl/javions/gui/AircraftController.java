@@ -112,8 +112,8 @@ public final class AircraftController {
 
         trajectory.visibleProperty().bind(Bindings.equal(aircraftState, selectedAircraft));
         trajectory.visibleProperty().addListener((p, o, n) -> {
-            if (!o && n) createTrajectory(aircraftState, trajectory);
-            if (o && !n) trajectory.getChildren().clear();
+            if (n) createTrajectory(aircraftState, trajectory);
+            if (!n) trajectory.getChildren().clear();
         });
 
         // à verifier -> optimisation
@@ -350,6 +350,6 @@ public final class AircraftController {
      * @return la couleur correspondante
      */
     private Color plasmaAt(double value) {
-        return ColorRamp.PLASMA.at(Math.pow(value / 12000, 1.0 / 3));
+        return ColorRamp.PLASMA.at(Math.cbrt(value / 12000));
     }
 }

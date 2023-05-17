@@ -44,7 +44,6 @@ public class BaseMapController {
         canvas.heightProperty().bind(pane.heightProperty());
 
         canvas.widthProperty().addListener((p, o, n) -> redrawOnNextPulse());
-        // if (o != n) ??
         canvas.heightProperty().addListener((p, o, n) -> redrawOnNextPulse());
 
         mapParameters.zoomProperty().addListener((p, o, n) -> redrawOnNextPulse());

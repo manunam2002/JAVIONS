@@ -45,7 +45,7 @@ public class AircraftTableController {
         pane.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         pane.setTableMenuButtonVisible(true);
 
-        TableColumn<ObservableAircraftState, String> iCAOColumn = createTextColumn("OACI", 60, //constantes?
+        TableColumn<ObservableAircraftState, String> iCAOColumn = createTextColumn("OACI", 60,
                 f -> new ReadOnlyStringWrapper(f.getValue().getIcaoAddress().string()));
 
         TableColumn<ObservableAircraftState, String> callSignColumn = createTextColumn("Indicatif", 70,

@@ -61,10 +61,7 @@ public final class AircraftStateManager {
         if (map.containsKey(icaoAddress)) {
             map.get(icaoAddress).update(message);
             ObservableAircraftState aircraftState = map.get(icaoAddress).stateSetter();
-            // duplication de code?? - ligne 75
-            if (Objects.nonNull(aircraftState.getPosition())) {
-                observableAircraftStates.add(aircraftState);
-            }
+            addToStates(aircraftState);
         } else {
             AircraftStateAccumulator<ObservableAircraftState> aircraftStateAccumulator =
                     new AircraftStateAccumulator<>(
@@ -73,9 +70,7 @@ public final class AircraftStateManager {
             aircraftStateAccumulator.update(message);
             ObservableAircraftState aircraftState = aircraftStateAccumulator.stateSetter();
             map.put(icaoAddress, aircraftStateAccumulator);
-            if (Objects.nonNull(aircraftState.getPosition())) {
-                observableAircraftStates.add(aircraftState);
-            }
+            addToStates(aircraftState);
         }
 
         lastMessageTimeStampNs = message.timeStampNs();
@@ -96,6 +91,16 @@ public final class AircraftStateManager {
                 it.remove();
                 observableAircraftStates.remove(state);
             }
+        }
+    }
+
+    /**
+     * ajoute l'état d'un aéronef à l'ensemble observable des états si sa position n'est pas nulle
+     * @param state l'état d'un aéronef
+     */
+    private void addToStates(ObservableAircraftState state){
+        if (Objects.nonNull(state.getPosition())) {
+            observableAircraftStates.add(state);
         }
     }
 }

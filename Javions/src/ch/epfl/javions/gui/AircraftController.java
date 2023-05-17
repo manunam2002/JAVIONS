@@ -12,7 +12,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
@@ -186,6 +185,7 @@ public final class AircraftController {
             startAlt = endAlt;
         }*/
 
+        ArrayList<Line> trajectoryLines = new ArrayList<>();
         List<ObservableAircraftState.AirbornePos> t = aircraftState.getTrajectory();
         double startX = WebMercator.x(mapParameters.zoom(), t.get(0).position().longitude());
         double startY = WebMercator.y(mapParameters.zoom(), t.get(0).position().latitude());
@@ -202,12 +202,14 @@ public final class AircraftController {
             line.setStroke(
                         new LinearGradient(0, 0, 1, 0, true, NO_CYCLE, s1, s2));
 
-            trajectory.getChildren().add(line);
+            trajectoryLines.add(line);
 
             startX = endX;
             startY = endY;
             startAlt = endAlt;
         }
+
+        trajectory.getChildren().setAll(trajectoryLines);
     }
 
     /**

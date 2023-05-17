@@ -65,10 +65,9 @@ public final class ColorRamp {
         if (index >= 1) return colors[size - 1];
 
         double c = index * (size - 1);
-        int lowerIndex = (int) Math.floor(c);
-        int higherIndex = lowerIndex + 1;
+        int lowerIndex = (int) c;
 
-        return colors[lowerIndex].interpolate(colors[higherIndex], c - lowerIndex);
+        return colors[lowerIndex].interpolate(colors[lowerIndex+1], c - lowerIndex);
     }
 
 }

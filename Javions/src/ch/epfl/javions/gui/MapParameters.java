@@ -103,8 +103,6 @@ public class MapParameters {
      */
     public void changeZoomLevel(int delta) {
         int clampedDelta = Math2.clamp(6 - zoom(), delta, 19 - zoom());
-        if (clampedDelta == 0) return;
-        // à verifier
 
         zoom.set(zoom() + clampedDelta);
         minX.set(Math.scalb(minX(), clampedDelta));

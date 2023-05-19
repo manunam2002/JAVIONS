@@ -30,7 +30,7 @@ public class AircraftTableController {
     private static final int NUMERIC_COLUMN_WIDTH = 85;
     private final TableView<ObservableAircraftState> pane;
     private Consumer<ObservableAircraftState> doubleClickConsumer;
-    private NumberFormat numberFormatPos;
+    private final NumberFormat numberFormatPos;
 
     /**
      * constructeur public
@@ -72,9 +72,9 @@ public class AircraftTableController {
         numberFormatAltAndVel.setMaximumFractionDigits(0);
         numberFormatAltAndVel.setMinimumFractionDigits(0);
 
-        TableColumn<ObservableAircraftState, String> longitudeColumn = createPositionColumn(true);
+        TableColumn<ObservableAircraftState, String> longitudeColumn = createPositionColumn(false);
 
-        TableColumn<ObservableAircraftState, String> latitudeColumn = createPositionColumn(false);
+        TableColumn<ObservableAircraftState, String> latitudeColumn = createPositionColumn(true);
 
         TableColumn<ObservableAircraftState, String> altitudeColumn = createNumberColumn("Altitude (m)",
                 numberFormatAltAndVel, f ->

@@ -21,8 +21,8 @@ import java.util.Map;
  */
 public final class TileManager {
 
-    public static final String SLASH = "/";
-    public static final String PNG = ".png";
+    private static final String SLASH = "/";
+    private static final String PNG = ".png";
     private final Path path;
     private final String serverName;
     private final Map<TileId, Image> cache;

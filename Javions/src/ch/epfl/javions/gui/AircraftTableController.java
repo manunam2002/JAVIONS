@@ -97,7 +97,7 @@ public class AircraftTableController {
                         pane.sort();
                     }
                     if (change.wasRemoved()) {
-                        pane.getItems().remove(change.getElementAdded());
+                        pane.getItems().remove(change.getElementRemoved());
                     }
                 });
 

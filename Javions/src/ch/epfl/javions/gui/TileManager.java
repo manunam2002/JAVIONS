@@ -55,7 +55,6 @@ public final class TileManager {
         }
 
         Path tilePath = Path.of(path.toString() + SLASH + tile.zoom + SLASH + tile.x + SLASH + tile.y + PNG);
-        // constantes ?
         if (Files.exists(tilePath)) {
             try (FileInputStream fis = new FileInputStream(tilePath.toString())) {
                 return new Image(new ByteArrayInputStream(fis.readAllBytes()));

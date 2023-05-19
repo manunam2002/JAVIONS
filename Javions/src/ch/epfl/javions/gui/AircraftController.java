@@ -115,16 +115,7 @@ public final class AircraftController {
             if (!n) trajectory.getChildren().clear();
         });
 
-        // à verifier -> optimisation
         aircraftState.getTrajectory().addListener((ListChangeListener<ObservableAircraftState.AirbornePos>) change -> {
-            /*if (aircraftState.equals(selectedAircraft.get()) &&
-                    change.next() && change.wasAdded()) {
-                int index = aircraftState.getTrajectory().size() - 1;
-                ObservableAircraftState.AirbornePos start = aircraftState.getTrajectory().get(index - 1);
-                ObservableAircraftState.AirbornePos end = aircraftState.getTrajectory().get(index);
-                addLineToTrajectory(start, end, trajectory);
-
-            }*/
             if (aircraftState.equals(selectedAircraft.get()))
                 createTrajectory(aircraftState, trajectory);
         });
@@ -142,49 +133,6 @@ public final class AircraftController {
      * @param trajectory    le groupe de la trajectoire
      */
     private void createTrajectory(ObservableAircraftState aircraftState, Group trajectory) {
-        trajectory.getChildren().clear();
-        /*if (aircraftState.getTrajectory().size() < 2) return;
-
-        //Iterator<ObservableAircraftState.AirbornePos> it = aircraftState.getTrajectory().iterator();
-
-        *//*ObservableAircraftState.AirbornePos start = it.next();
-        while (it.hasNext()) {
-            ObservableAircraftState.AirbornePos end = it.next();
-            addLineToTrajectory(start, end, trajectory);
-            start = end;
-        }*//*
-
-        ObservableAircraftState.AirbornePos start = it.next();
-        double startX = WebMercator.x(mapParameters.zoom(), start.position().longitude());
-        double startY = WebMercator.y(mapParameters.zoom(), start.position().latitude());
-        double startAlt = start.altitude();
-        while (it.hasNext()) {
-            ObservableAircraftState.AirbornePos end = it.next();
-            double endX = WebMercator.x(mapParameters.zoom(), end.position().longitude());
-            double endY = WebMercator.y(mapParameters.zoom(), end.position().latitude());
-            double endAlt = end.altitude();
-
-            Line line = new Line(startX, startY, endX, endY);
-
-            if (startAlt == endAlt) {
-                line.setStroke(plasmaAt(endAlt));
-            } else {
-                Color startColor = plasmaAt(startAlt);
-                Color endColor = plasmaAt(endAlt);
-                Stop s1 = new Stop(0, startColor);
-                Stop s2 = new Stop(1, endColor);
-                line.setStroke(
-                        new LinearGradient(0, 0, 1, 0, true, NO_CYCLE, s1, s2));
-            }
-
-            trajectory.getChildren().add(line);
-
-
-            startX = endX;
-            startY = endY;
-            startAlt = endAlt;
-        }*/
-
         ArrayList<Line> trajectoryLines = new ArrayList<>();
         List<ObservableAircraftState.AirbornePos> t = aircraftState.getTrajectory();
         double startX = WebMercator.x(mapParameters.zoom(), t.get(0).position().longitude());
@@ -210,36 +158,6 @@ public final class AircraftController {
         }
 
         trajectory.getChildren().setAll(trajectoryLines);
-    }
-
-    /**
-     * ajoute une ligne à la trajectoire
-     *
-     * @param start      la pasition du début
-     * @param end        la position de la fin
-     * @param trajectory le groupe de la trajectoire
-     */
-    private void addLineToTrajectory(ObservableAircraftState.AirbornePos start,
-                                     ObservableAircraftState.AirbornePos end,
-                                     Group trajectory) {
-        double startX = WebMercator.x(mapParameters.zoom(), start.position().longitude());
-        double startY = WebMercator.y(mapParameters.zoom(), start.position().latitude());
-        double endX = WebMercator.x(mapParameters.zoom(), end.position().longitude());
-        double endY = WebMercator.y(mapParameters.zoom(), end.position().latitude());
-
-        Line line = new Line(startX, startY, endX, endY);
-
-        if (start.altitude() == end.altitude()) {
-            line.setStroke(plasmaAt(end.altitude()));
-        } else {
-            Color startColor = plasmaAt(start.altitude());
-            Color endColor = plasmaAt(end.altitude());
-            Stop s1 = new Stop(0, startColor);
-            Stop s2 = new Stop(1, endColor);
-            line.setStroke(new LinearGradient(0, 0, 1, 0, true, NO_CYCLE, s1, s2));
-        }
-
-        trajectory.getChildren().add(line);
     }
 
     /**
@@ -295,12 +213,11 @@ public final class AircraftController {
         }, aircraftState.callSignProperty());
         StringBinding line1 = Bindings.createStringBinding(() -> {
             String velocity = (Double.isNaN(aircraftState.getVelocity())) ? "?" :
-                    String.valueOf((int) Units.convert(aircraftState.getVelocity(),
-                            //cast okay?
+                    String.format("%.0f", Units.convert(aircraftState.getVelocity(),
                             Units.Speed.METER_PER_SECOND, Units.Speed.KILOMETER_PER_HOUR));
             String altitude = (Double.isNaN(aircraftState.getAltitude())) ? "?" :
-                    String.valueOf((int) aircraftState.getAltitude());
-            return String.format("%s km/h\u2002%s mètres", velocity, altitude);
+                    String.format("%.0f", aircraftState.getAltitude());
+            return String.format("%s km/h\u2002%s m", velocity, altitude);
         }, aircraftState.velocityProperty(), aircraftState.altitudeProperty());
 
         Text text = new Text();

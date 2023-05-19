@@ -30,6 +30,7 @@ public class AircraftTableController {
     private static final int NUMERIC_COLUMN_WIDTH = 85;
     private final TableView<ObservableAircraftState> pane;
     private Consumer<ObservableAircraftState> doubleClickConsumer;
+    private NumberFormat numberFormatPos;
 
     /**
      * constructeur public
@@ -63,7 +64,7 @@ public class AircraftTableController {
         TableColumn<ObservableAircraftState, String> descriptionColumn = createTextColumn("Description", 70,
                 f -> new ReadOnlyObjectWrapper<>(f.getValue().getAircraftData()).map(d -> d.description().string()));
 
-        NumberFormat numberFormatPos = NumberFormat.getInstance();
+        numberFormatPos = NumberFormat.getInstance();
         numberFormatPos.setMaximumFractionDigits(4);
         numberFormatPos.setMinimumFractionDigits(0);
 
@@ -71,15 +72,9 @@ public class AircraftTableController {
         numberFormatAltAndVel.setMaximumFractionDigits(0);
         numberFormatAltAndVel.setMinimumFractionDigits(0);
 
-        TableColumn<ObservableAircraftState, String> longitudeColumn = createNumberColumn("Longitude (°)",
-                numberFormatPos, f ->
-                        f.getValue().positionProperty().map(geoPos -> numberFormatPos.format(
-                                Units.convertTo(geoPos.longitude(), Units.Angle.DEGREE))));
+        TableColumn<ObservableAircraftState, String> longitudeColumn = createPositionColumn(true);
 
-        TableColumn<ObservableAircraftState, String> latitudeColumn = createNumberColumn("Latitude (°)",
-                numberFormatPos, f ->
-                        f.getValue().positionProperty().map(geoPos -> numberFormatPos.format(
-                                Units.convertTo(geoPos.latitude(), Units.Angle.DEGREE))));
+        TableColumn<ObservableAircraftState, String> latitudeColumn = createPositionColumn(false);
 
         TableColumn<ObservableAircraftState, String> altitudeColumn = createNumberColumn("Altitude (m)",
                 numberFormatAltAndVel, f ->
@@ -169,6 +164,14 @@ public class AircraftTableController {
         });
 
         return column;
+    }
+
+    private TableColumn<ObservableAircraftState, String> createPositionColumn(Boolean latitude){
+        String title = (latitude) ? "Latitude (°)" : "Longitude (°)";
+        return createNumberColumn(title, numberFormatPos, f ->
+                f.getValue().positionProperty().map(geoPos -> numberFormatPos.format(
+                        Units.convertTo((latitude) ? geoPos.latitude() : geoPos.longitude(),
+                                Units.Angle.DEGREE))));
     }
 
     public TableView<ObservableAircraftState> pane() {

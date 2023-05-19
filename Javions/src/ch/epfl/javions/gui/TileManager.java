@@ -21,6 +21,8 @@ import java.util.Map;
  */
 public final class TileManager {
 
+    public static final String SLASH = "/";
+    public static final String PNG = ".png";
     private final Path path;
     private final String serverName;
     private final Map<TileId, Image> cache;
@@ -52,7 +54,7 @@ public final class TileManager {
             cache.remove(it.next());
         }
 
-        Path tilePath = Path.of(path.toString() + "/" + tile.zoom + "/" + tile.x + "/" + tile.y + ".png");
+        Path tilePath = Path.of(path.toString() + SLASH + tile.zoom + SLASH + tile.x + SLASH + tile.y + PNG);
         // constantes ?
         if (Files.exists(tilePath)) {
             try (FileInputStream fis = new FileInputStream(tilePath.toString())) {
@@ -60,8 +62,8 @@ public final class TileManager {
             }
         }
 
-        Files.createDirectories(Path.of(path + "/" + tile.zoom + "/" + tile.x));
-        String urlName = "https://" + serverName + "/" + tile.zoom + "/" + tile.x + "/" + tile.y + ".png";
+        Files.createDirectories(Path.of(path + SLASH + tile.zoom + SLASH + tile.x));
+        String urlName = "https://" + serverName + SLASH + tile.zoom + SLASH + tile.x + SLASH + tile.y + PNG;
         URL u = new URL(urlName);
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "Javions");

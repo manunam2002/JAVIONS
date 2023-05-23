@@ -2,12 +2,15 @@ package ch.epfl.javions.gui;
 
 import ch.epfl.javions.Units;
 import ch.epfl.javions.WebMercator;
+import ch.epfl.javions.adsb.CallSign;
 import ch.epfl.javions.aircraft.AircraftDescription;
 import ch.epfl.javions.aircraft.AircraftTypeDesignator;
+import ch.epfl.javions.aircraft.WakeTurbulenceCategory;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -202,15 +205,13 @@ public final class AircraftController {
                         mapParameters.zoom() >= 11 || (aircraftState.equals(selectedAircraft.get())),
                 mapParameters.zoomProperty(), selectedAircraft));
 
-        StringBinding line0 = Bindings.createStringBinding(() -> {
-            if (Objects.nonNull(aircraftState.getAircraftData()) &&
-                    !aircraftState.getAircraftData().registration().string().isEmpty())
-                return aircraftState.getAircraftData().registration().string();
-            if (Objects.nonNull(aircraftState.getCallSign()) &&
-                    !aircraftState.getCallSign().string().isEmpty())
-                return aircraftState.getCallSign().string();
-            return aircraftState.getIcaoAddress().string();
-        }, aircraftState.callSignProperty());
+        Object line0 = (Objects.nonNull(aircraftState.getAircraftData()) &&
+                !aircraftState.getAircraftData().registration().string().isEmpty()) ?
+            aircraftState.getAircraftData().registration().string() :
+                Bindings.when(aircraftState.callSignProperty().isNotNull()).
+                        then(Bindings.convert(aircraftState.callSignProperty().map(CallSign::string))).
+                        otherwise(aircraftState.getIcaoAddress().string());
+
         StringBinding line1 = Bindings.createStringBinding(() -> {
             String velocity = (Double.isNaN(aircraftState.getVelocity())) ? "?" :
                     String.format("%.0f", Units.convert(aircraftState.getVelocity(),
@@ -243,8 +244,8 @@ public final class AircraftController {
 
         ObjectBinding<AircraftIcon> aircraftIcon = Bindings.createObjectBinding(() -> {
                     if (Objects.isNull(aircraftState.getAircraftData())) return AircraftIcon.iconFor(
-                            new AircraftTypeDesignator(""), new AircraftDescription(""), 0,
-                            null);
+                            new AircraftTypeDesignator(""), new AircraftDescription(""),
+                            aircraftState.getCategory(), WakeTurbulenceCategory.of(""));
                     return AircraftIcon.iconFor(aircraftState.getAircraftData().typeDesignator(),
                             aircraftState.getAircraftData().description(),
                             aircraftState.getCategory(),

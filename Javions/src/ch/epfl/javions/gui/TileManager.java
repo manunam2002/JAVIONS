@@ -37,6 +37,7 @@ public final class TileManager {
         this.path = path;
         this.serverName = serverName;
         cache = new LinkedHashMap<>(100, 1, false);
+        //check load factor
     }
 
     /**

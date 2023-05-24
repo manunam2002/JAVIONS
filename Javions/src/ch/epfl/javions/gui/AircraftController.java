@@ -10,7 +10,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -242,16 +241,17 @@ public final class AircraftController {
         icon.getStyleClass().add("aircraft");
         iconAndLabelGroup.getChildren().add(icon);
 
-        ObjectBinding<AircraftIcon> aircraftIcon = Bindings.createObjectBinding(() -> {
-                    if (Objects.isNull(aircraftState.getAircraftData())) return AircraftIcon.iconFor(
-                            new AircraftTypeDesignator(""), new AircraftDescription(""),
-                            aircraftState.getCategory(), WakeTurbulenceCategory.of(""));
-                    return AircraftIcon.iconFor(aircraftState.getAircraftData().typeDesignator(),
-                            aircraftState.getAircraftData().description(),
-                            aircraftState.getCategory(),
-                            aircraftState.getAircraftData().wakeTurbulenceCategory());
-                },
-                aircraftState.categoryProperty());
+        ObjectBinding<AircraftIcon> aircraftIcon = (Objects.isNull(aircraftState.getAircraftData())) ?
+                Bindings.createObjectBinding(() ->
+                        AircraftIcon.iconFor(new AircraftTypeDesignator(""), new AircraftDescription(""),
+                                aircraftState.getCategory(), WakeTurbulenceCategory.of("")),
+                        aircraftState.categoryProperty()) :
+                Bindings.createObjectBinding(() ->
+                        AircraftIcon.iconFor(aircraftState.getAircraftData().typeDesignator(),
+                                aircraftState.getAircraftData().description(),
+                                aircraftState.getCategory(),
+                                aircraftState.getAircraftData().wakeTurbulenceCategory()),
+                        aircraftState.categoryProperty());
 
         icon.contentProperty().bind(Bindings.createStringBinding(() -> aircraftIcon.get().svgPath()));
         icon.rotateProperty().bind(Bindings.createDoubleBinding(() -> (aircraftIcon.get().canRotate()) ?

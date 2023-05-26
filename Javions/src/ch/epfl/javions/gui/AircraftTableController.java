@@ -47,6 +47,25 @@ public class AircraftTableController {
         pane.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         pane.setTableMenuButtonVisible(true);
 
+        addAllColumns();
+
+        addListeners(states, selectedAircraft);
+
+        addEventHandlers(selectedAircraft);
+    }
+
+    public TableView<ObservableAircraftState> pane() {
+        return pane;
+    }
+
+    public void setOnDoubleClick(Consumer<ObservableAircraftState> consumer) {
+        this.doubleClickConsumer = consumer;
+    }
+
+    /**
+     * ajoute toutes les colonnes à la table
+     */
+    private void addAllColumns() {
         TableColumn<ObservableAircraftState, String> iCAOColumn = createTextColumn("OACI", 60,
                 f -> new ReadOnlyStringWrapper(f.getValue().getIcaoAddress().string()));
 
@@ -90,7 +109,15 @@ public class AircraftTableController {
 
         pane.getColumns().setAll(iCAOColumn, callSignColumn, registerColumn, modelColumn, typeDesignatorColumn,
                 descriptionColumn, longitudeColumn, latitudeColumn, altitudeColumn, velocityColumn);
+    }
 
+    /**
+     * ajoute tous les auditeurs
+     * @param states l'ensemble des états des aéronefs
+     * @param selectedAircraft la propriété de l'aéronef selectionné
+     */
+    private void addListeners(ObservableSet<ObservableAircraftState> states,
+                              ObjectProperty<ObservableAircraftState> selectedAircraft) {
         states.addListener((SetChangeListener<ObservableAircraftState>)
                 change -> {
                     if (change.wasAdded()) {
@@ -110,7 +137,13 @@ public class AircraftTableController {
         });
 
         pane.getSelectionModel().selectedItemProperty().addListener((p, o, n) -> selectedAircraft.set(n));
+    }
 
+    /**
+     * ajoute les gestionnaires d'évènements
+     * @param selectedAircraft la propriété de l'aéronef selectionné
+     */
+    private void addEventHandlers(ObjectProperty<ObservableAircraftState> selectedAircraft) {
         pane.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2 && e.getButton() == MouseButton.PRIMARY
                     && Objects.nonNull(doubleClickConsumer) && Objects.nonNull(selectedAircraft.get())) {
@@ -167,19 +200,18 @@ public class AircraftTableController {
         return column;
     }
 
+    /**
+     * crée une colonne numerique de longitude ou latitude à ajouter à la table
+     *
+     * @param latitude vrai si la colonne doit afficher la latitude et faux si la colonne doit afficher la longitude
+     * @param nf le formatteur de nombres
+     * @return la colonne numerique de longitude ou latitude à ajouter à la table
+     */
     private TableColumn<ObservableAircraftState, String> createPositionColumn(Boolean latitude, NumberFormat nf){
         String title = (latitude) ? "Latitude (°)" : "Longitude (°)";
         return createNumberColumn(title, nf, f ->
                 f.getValue().positionProperty().map(geoPos -> nf.format(
                         Units.convertTo((latitude) ? geoPos.latitude() : geoPos.longitude(),
                                 Units.Angle.DEGREE))));
-    }
-
-    public TableView<ObservableAircraftState> pane() {
-        return pane;
-    }
-
-    public void setOnDoubleClick(Consumer<ObservableAircraftState> consumer) {
-        this.doubleClickConsumer = consumer;
     }
 }

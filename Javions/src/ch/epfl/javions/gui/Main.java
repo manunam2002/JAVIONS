@@ -127,9 +127,11 @@ public final class Main extends Application {
                     long start = System.nanoTime();
                     String file = getParameters().getRaw().get(0);
                     try {
+                        long time;
                         for (Message m : readAllMessages(file)) {
-                            if ((System.nanoTime() - start) < m.timeStampNs()) {
-                                sleep(Duration.ofNanos(m.timeStampNs() + start - System.nanoTime()).toMillis());
+                            time = System.nanoTime();
+                            if ((time - start) < m.timeStampNs()) {
+                                sleep(Duration.ofNanos(m.timeStampNs() + start - time).toMillis());
                             }
                             queue.add(m);
                         }
@@ -158,7 +160,6 @@ public final class Main extends Application {
                         throw new RuntimeException(e);
                     }
                 }
-                asm.purge();
             }
         }.start();
     }

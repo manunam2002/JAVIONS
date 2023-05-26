@@ -43,18 +43,38 @@ public class BaseMapController {
         canvas.widthProperty().bind(pane.widthProperty());
         canvas.heightProperty().bind(pane.heightProperty());
 
-        canvas.widthProperty().addListener((p, o, n) -> redrawOnNextPulse());
-        canvas.heightProperty().addListener((p, o, n) -> redrawOnNextPulse());
+        addListeners(mapParameters);
 
-        mapParameters.zoomProperty().addListener((p, o, n) -> redrawOnNextPulse());
-        mapParameters.minXProperty().addListener((p, o, n) -> redrawOnNextPulse());
-        mapParameters.minYProperty().addListener((p, o, n) -> redrawOnNextPulse());
+        addEventHandlers(mapParameters);
+    }
 
-        canvas.sceneProperty().addListener((p, oldS, newS) -> {
-            assert oldS == null;
-            newS.addPreLayoutPulseListener(this::redrawIfNeeded);
-        });
+    /**
+     * retourne le panneau JavaFX affichant le fond de carte
+     *
+     * @return le panneau JavaFX affichant le fond de carte
+     */
+    public Pane pane() {
+        return pane;
+    }
 
+    /**
+     * déplace la portion visible de la carte afin qu'elle soit centrée en le point donné
+     *
+     * @param point le point donné
+     */
+    public void centerOn(GeoPos point) {
+        double deltaX = WebMercator.x(mapParameters.zoom(), point.longitude()) - (mapParameters.minX()
+                + (canvas.getWidth()/2));
+        double deltaY = WebMercator.y(mapParameters.zoom(), point.latitude()) - (mapParameters.minY()
+                + (canvas.getHeight()/2));
+        mapParameters.scroll(deltaX, deltaY);
+    }
+
+    /**
+     * ajoute tous les gestionnaires dévènements
+     * @param mapParameters les paramètres de la carte
+     */
+    private void addEventHandlers(MapParameters mapParameters) {
         LongProperty minScrollTime = new SimpleLongProperty();
         pane.setOnScroll(e -> {
             int zoomDelta = (int) Math.signum(e.getDeltaY());
@@ -81,25 +101,21 @@ public class BaseMapController {
     }
 
     /**
-     * retourne le panneau JavaFX affichant le fond de carte
-     *
-     * @return le panneau JavaFX affichant le fond de carte
+     * ajoute tous les auditeurs
+     * @param mapParameters les paramètres de la carte
      */
-    public Pane pane() {
-        return pane;
-    }
+    private void addListeners(MapParameters mapParameters) {
+        canvas.widthProperty().addListener((p, o, n) -> redrawOnNextPulse());
+        canvas.heightProperty().addListener((p, o, n) -> redrawOnNextPulse());
 
-    /**
-     * déplace la portion visible de la carte afin qu'elle soit centrée en le point donné
-     *
-     * @param point le point donné
-     */
-    public void centerOn(GeoPos point) {
-        double deltaX = WebMercator.x(mapParameters.zoom(), point.longitude()) - (mapParameters.minX()
-                + (canvas.getWidth()/2));
-        double deltaY = WebMercator.y(mapParameters.zoom(), point.latitude()) - (mapParameters.minY()
-                + (canvas.getHeight()/2));
-        mapParameters.scroll(deltaX, deltaY);
+        mapParameters.zoomProperty().addListener((p, o, n) -> redrawOnNextPulse());
+        mapParameters.minXProperty().addListener((p, o, n) -> redrawOnNextPulse());
+        mapParameters.minYProperty().addListener((p, o, n) -> redrawOnNextPulse());
+
+        canvas.sceneProperty().addListener((p, oldS, newS) -> {
+            assert oldS == null;
+            newS.addPreLayoutPulseListener(this::redrawIfNeeded);
+        });
     }
 
     /**

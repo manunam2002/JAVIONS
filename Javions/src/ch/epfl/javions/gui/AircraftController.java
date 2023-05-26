@@ -63,16 +63,7 @@ public final class AircraftController {
         pane.setPickOnBounds(false);
         pane.getStylesheets().add(AIRCRAFT_CSS);
 
-        states.addListener((SetChangeListener<ObservableAircraftState>)
-                change -> {
-                    if (change.wasAdded()) {
-                        addGroup(change.getElementAdded());
-                    }
-                    if (change.wasRemoved()) {
-                        String id = change.getElementRemoved().getIcaoAddress().string();
-                        pane.getChildren().removeIf(group -> group.getId().equals(id));
-                    }
-                });
+        addListeners(states);
 
         for (ObservableAircraftState aircraftState : states) {
             addGroup(aircraftState);
@@ -89,12 +80,28 @@ public final class AircraftController {
     }
 
     /**
+     * ajoute l'auditeur à l'ensemble des états des aéronefs
+     */
+    private void addListeners(ObservableSet<ObservableAircraftState> states){
+        states.addListener((SetChangeListener<ObservableAircraftState>)
+                change -> {
+                    if (change.wasAdded()) {
+                        addGroup(change.getElementAdded());
+                    }
+                    if (change.wasRemoved()) {
+                        String id = change.getElementRemoved().getIcaoAddress().string();
+                        pane.getChildren().removeIf(group -> group.getId().equals(id));
+                    }
+                });
+    }
+
+    /**
      * ajoute le groupe de l'aéronef au panneau
      *
      * @param aircraftState l'état de l'aéronef
      */
     private void addGroup(ObservableAircraftState aircraftState) {
-        Group aircraftGroup = new Group();
+        Group aircraftGroup = new Group(); //TODO : methodes retournent groupes à mettre directement dans le constructeur
         pane.getChildren().add(aircraftGroup);
         aircraftGroup.setId(aircraftState.getIcaoAddress().string());
         aircraftGroup.viewOrderProperty().bind(aircraftState.altitudeProperty().negate());

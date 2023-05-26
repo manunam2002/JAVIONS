@@ -21,8 +21,12 @@ import java.util.Map;
  */
 public final class TileManager {
 
+    private static final int CACHE_MAX_CAPACITY = 100;
     private static final String SLASH = "/";
     private static final String PNG = ".png";
+    private static final String HTTPS = "https://";
+    private static final String USER_AGENT = "User-Agent";
+    private static final String JAVIONS = "Javions";
     private final Path path;
     private final String serverName;
     private final Map<TileId, Image> cache;
@@ -36,7 +40,7 @@ public final class TileManager {
     public TileManager(Path path, String serverName) {
         this.path = path;
         this.serverName = serverName;
-        cache = new LinkedHashMap<>(100, .75f, false);
+        cache = new LinkedHashMap<>(CACHE_MAX_CAPACITY, .75f, false);
     }
 
     /**
@@ -49,7 +53,7 @@ public final class TileManager {
     public Image imageForTileAt(TileId tile) throws IOException {
         if (cache.containsKey(tile)) return cache.get(tile);
 
-        if (cache.size() == 100) {
+        if (cache.size() == CACHE_MAX_CAPACITY) {
             Iterator<TileId> it = cache.keySet().iterator();
             cache.remove(it.next());
         }
@@ -62,10 +66,10 @@ public final class TileManager {
         }
 
         Files.createDirectories(Path.of(path + SLASH + tile.zoom + SLASH + tile.x));
-        String urlName = "https://" + serverName + SLASH + tile.zoom + SLASH + tile.x + SLASH + tile.y + PNG;
+        String urlName = HTTPS + serverName + SLASH + tile.zoom + SLASH + tile.x + SLASH + tile.y + PNG;
         URL u = new URL(urlName);
         URLConnection c = u.openConnection();
-        c.setRequestProperty("User-Agent", "Javions");
+        c.setRequestProperty(USER_AGENT, JAVIONS);
 
         try (InputStream i = c.getInputStream()) {
             byte[] imageBytes = i.readAllBytes();

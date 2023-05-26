@@ -30,7 +30,6 @@ public class AircraftTableController {
     private static final int NUMERIC_COLUMN_WIDTH = 85;
     private final TableView<ObservableAircraftState> pane;
     private Consumer<ObservableAircraftState> doubleClickConsumer;
-    private final NumberFormat numberFormatPos;
 
     /**
      * constructeur public
@@ -64,25 +63,25 @@ public class AircraftTableController {
         TableColumn<ObservableAircraftState, String> descriptionColumn = createTextColumn("Description", 70,
                 f -> new ReadOnlyObjectWrapper<>(f.getValue().getAircraftData()).map(d -> d.description().string()));
 
-        numberFormatPos = NumberFormat.getInstance();
-        numberFormatPos.setMaximumFractionDigits(4);
-        numberFormatPos.setMinimumFractionDigits(0);
+        NumberFormat nbFormatPos = NumberFormat.getInstance();
+        nbFormatPos.setMaximumFractionDigits(4);
+        nbFormatPos.setMinimumFractionDigits(0);
 
-        NumberFormat numberFormatAltAndVel = NumberFormat.getInstance();
-        numberFormatAltAndVel.setMaximumFractionDigits(0);
-        numberFormatAltAndVel.setMinimumFractionDigits(0);
+        NumberFormat nbFormatAltAndVel = NumberFormat.getInstance();
+        nbFormatAltAndVel.setMaximumFractionDigits(0);
+        nbFormatAltAndVel.setMinimumFractionDigits(0);
 
-        TableColumn<ObservableAircraftState, String> longitudeColumn = createPositionColumn(false);
+        TableColumn<ObservableAircraftState, String> longitudeColumn = createPositionColumn(false, nbFormatPos);
 
-        TableColumn<ObservableAircraftState, String> latitudeColumn = createPositionColumn(true);
+        TableColumn<ObservableAircraftState, String> latitudeColumn = createPositionColumn(true, nbFormatPos);
 
         TableColumn<ObservableAircraftState, String> altitudeColumn = createNumberColumn("Altitude (m)",
-                numberFormatAltAndVel, f ->
-                        f.getValue().altitudeProperty().map(numberFormatAltAndVel::format));
+                nbFormatAltAndVel, f ->
+                        f.getValue().altitudeProperty().map(nbFormatAltAndVel::format));
 
         TableColumn<ObservableAircraftState, String> velocityColumn = createNumberColumn("Vitesse (km/h)",
-                numberFormatAltAndVel, f ->
-                        f.getValue().velocityProperty().map(v -> numberFormatAltAndVel.format(
+                nbFormatAltAndVel, f ->
+                        f.getValue().velocityProperty().map(v -> nbFormatAltAndVel.format(
                                 Units.convert(v.doubleValue(),
                                         Units.Speed.METER_PER_SECOND,
                                         Units.Speed.KILOMETER_PER_HOUR))));
@@ -127,8 +126,8 @@ public class AircraftTableController {
      * @return la colonne de texte
      */
     private TableColumn<ObservableAircraftState, String> createTextColumn(String title, int width,
-                                                                          Callback<TableColumn.CellDataFeatures<ObservableAircraftState, String>,
-                                                                                  ObservableValue<String>> value) {
+                                             Callback<TableColumn.CellDataFeatures<ObservableAircraftState, String>,
+                                             ObservableValue<String>> value) {
         TableColumn<ObservableAircraftState, String> column = new TableColumn<>(title);
         column.setPrefWidth(width);
         column.setCellValueFactory(value);
@@ -166,10 +165,10 @@ public class AircraftTableController {
         return column;
     }
 
-    private TableColumn<ObservableAircraftState, String> createPositionColumn(Boolean latitude){
+    private TableColumn<ObservableAircraftState, String> createPositionColumn(Boolean latitude, NumberFormat nf){
         String title = (latitude) ? "Latitude (°)" : "Longitude (°)";
-        return createNumberColumn(title, numberFormatPos, f ->
-                f.getValue().positionProperty().map(geoPos -> numberFormatPos.format(
+        return createNumberColumn(title, nf, f ->
+                f.getValue().positionProperty().map(geoPos -> nf.format(
                         Units.convertTo((latitude) ? geoPos.latitude() : geoPos.longitude(),
                                 Units.Angle.DEGREE))));
     }

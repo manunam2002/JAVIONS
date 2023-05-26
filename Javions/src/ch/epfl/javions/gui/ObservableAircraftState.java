@@ -43,6 +43,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     public ObservableAircraftState(IcaoAddress icaoAddress, AircraftData aircraftData) {
         this.icaoAddress = Objects.requireNonNull(icaoAddress);
         this.aircraftData = aircraftData;
+
         lastMessageTimeStampNs = new SimpleLongProperty(0);
         category = new SimpleIntegerProperty(0);
         callSign = new SimpleObjectProperty<>(null);
@@ -50,6 +51,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
         altitude = new SimpleDoubleProperty(NaN);
         velocity = new SimpleDoubleProperty(NaN);
         trackOrHeading = new SimpleDoubleProperty(NaN);
+
         observableTrajectory = FXCollections.observableArrayList();
         unmodifiableTrajectory = FXCollections.unmodifiableObservableList(observableTrajectory);
     }

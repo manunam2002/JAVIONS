@@ -38,6 +38,8 @@ import static java.lang.Thread.sleep;
 public final class Main extends Application {
 
     private final static long SECOND = Duration.ofSeconds(1).toNanos();
+    private static final int MIN_WIDTH = 800;
+    private static final int MIN_HEIGHT = 600;
     private long lastPurge;
 
     /**
@@ -96,54 +98,46 @@ public final class Main extends Application {
 
         primaryStage.setTitle("Javions");
         primaryStage.setScene(new Scene(splitPane));
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(600);
+        primaryStage.setMinWidth(MIN_WIDTH);
+        primaryStage.setMinHeight(MIN_HEIGHT);
         primaryStage.show();
-
-        Thread thread;
 
         ConcurrentLinkedQueue<Message> queue = new ConcurrentLinkedQueue<>();
 
-        if (getParameters().getRaw().isEmpty()) {
-
-            thread = new Thread(() -> {
-                try {
-                    AdsbDemodulator demodulator = new AdsbDemodulator(System.in);
-                    RawMessage rm;
-                    while ((rm = demodulator.nextMessage()) != null) {
-                        Message m = MessageParser.parse(rm);
-                        if (m != null) {
+        Thread thread = (getParameters().getRaw().isEmpty()) ?
+                new Thread(() -> {
+                    try {
+                        AdsbDemodulator demodulator = new AdsbDemodulator(System.in);
+                        RawMessage rm;
+                        while ((rm = demodulator.nextMessage()) != null) {
+                            Message m = MessageParser.parse(rm);
+                            if (m != null) {
+                                queue.add(m);
+                            }
+                        }
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                }) :
+                new Thread(() -> {
+                    long start = System.nanoTime();
+                    String file = getParameters().getRaw().get(0);
+                    try {
+                        for (Message m : readAllMessages(file)) {
+                            if ((System.nanoTime() - start) < m.timeStampNs()) {
+                                sleep(Duration.ofNanos(m.timeStampNs() + start - System.nanoTime()).toMillis());
+                            }
                             queue.add(m);
                         }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
-
-        } else {
-
-            thread = new Thread(() -> {
-                long start = System.nanoTime();
-                String file = getParameters().getRaw().get(0);
-                try {
-                    for (Message m : readAllMessages(file)) {
-                        if ((System.nanoTime() - start) < m.timeStampNs()) {
-                            sleep(Duration.ofNanos(m.timeStampNs() + start - System.nanoTime()).toMillis());
-                        }
-                        queue.add(m);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
+                });
 
         thread.setDaemon(true);
         thread.start();
 
         lastPurge = 0;
-
 
         new AnimationTimer() {
             @Override
@@ -160,6 +154,7 @@ public final class Main extends Application {
                         throw new RuntimeException(e);
                     }
                 }
+                asm.purge();
             }
         }.start();
     }

@@ -12,6 +12,8 @@ import javafx.beans.property.*;
  */
 public class MapParameters {
 
+    private static final int MIN_ZOOM = 6;
+    private static final int MAX_ZOOM = 19;
     private final IntegerProperty zoom;
     private final DoubleProperty minX;
     private final DoubleProperty minY;
@@ -24,7 +26,7 @@ public class MapParameters {
      * @param minY la coordonnée y du coin haut-gauche de la portion visible de la carte
      */
     public MapParameters(int zoom, int minX, int minY) {
-        Preconditions.checkArgument(6 <= zoom && zoom <= 19);
+        Preconditions.checkArgument(MIN_ZOOM <= zoom && zoom <= MAX_ZOOM);
 
         this.zoom = new SimpleIntegerProperty(zoom);
         this.minX = new SimpleDoubleProperty(minX);
@@ -102,7 +104,7 @@ public class MapParameters {
      * @param delta la différence de niveau de zoom
      */
     public void changeZoomLevel(int delta) {
-        int clampedDelta = Math2.clamp(6 - zoom(), delta, 19 - zoom());
+        int clampedDelta = Math2.clamp(MIN_ZOOM - zoom(), delta, MAX_ZOOM - zoom());
 
         zoom.set(zoom() + clampedDelta);
         minX.set(Math.scalb(minX(), clampedDelta));

@@ -138,7 +138,7 @@ public class BaseMapController {
                 try {
                     Image tile = tileManager.imageForTileAt(
                             new TileManager.TileId(mapParameters.zoom(), X + i, Y + j));
-                    graphicsContext.drawImage(tile, i* TILE_PIXELS - deltaX, j* TILE_PIXELS - deltaY);
+                    graphicsContext.drawImage(tile, (i * TILE_PIXELS) - deltaX, (j * TILE_PIXELS) - deltaY);
                 } catch (IOException e) {
                 }
             }

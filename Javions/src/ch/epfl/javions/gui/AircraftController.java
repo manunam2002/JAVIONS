@@ -253,12 +253,11 @@ public final class AircraftController {
                                 aircraftState.getAircraftData().wakeTurbulenceCategory()),
                         aircraftState.categoryProperty());
 
-        icon.contentProperty().bind(Bindings.createStringBinding(() -> aircraftIcon.get().svgPath()));
+        icon.contentProperty().bind(aircraftIcon.map(AircraftIcon::svgPath));
         icon.rotateProperty().bind(Bindings.createDoubleBinding(() -> (aircraftIcon.get().canRotate()) ?
-                                Units.convertTo(aircraftState.getTrackOrHeading(), Units.Angle.DEGREE) : 0,
-                aircraftState.trackOrHeadingProperty()));
-        icon.fillProperty().bind(Bindings.createObjectBinding(() -> plasmaAt(aircraftState.getAltitude()),
-                aircraftState.altitudeProperty()));
+                        Units.convertTo(aircraftState.getTrackOrHeading(), Units.Angle.DEGREE) : 0,
+                aircraftIcon, aircraftState.trackOrHeadingProperty()));
+        icon.fillProperty().bind(aircraftState.altitudeProperty().map(a -> plasmaAt((Double)a)));
 
         icon.setOnMouseClicked(e -> selectedAircraft.set(aircraftState));
     }

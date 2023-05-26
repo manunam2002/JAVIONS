@@ -1,6 +1,5 @@
 package ch.epfl.javions.gui;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.scene.layout.BorderPane;
@@ -25,18 +24,14 @@ public final class StatusLineController {
      */
     public StatusLineController() {
 
-        pane = new BorderPane();
-        pane.getStylesheets().add("status.css");
-
         Text left = new Text();
-        left.textProperty().bind(Bindings.createStringBinding(() ->
-                "Aéronefs visibles : " + aircraftCountProperty.get(), aircraftCountProperty));
-        pane.leftProperty().set(left);
+        left.textProperty().bind(aircraftCountProperty.map(i -> "Aéronefs visibles : "+i));
 
         Text right = new Text();
-        right.textProperty().bind(Bindings.createStringBinding(() ->
-                "Messages reçus : " + messageCountProperty.get(), messageCountProperty));
-        pane.rightProperty().set(right);
+        right.textProperty().bind(messageCountProperty.map(i -> "Messages reçus : "+i));
+
+        pane = new BorderPane(null, null, right, null, left);
+        pane.getStylesheets().add("status.css");
     }
 
     /**

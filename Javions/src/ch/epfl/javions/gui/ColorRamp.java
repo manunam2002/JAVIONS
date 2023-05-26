@@ -11,6 +11,7 @@ import javafx.scene.paint.Color;
  */
 public final class ColorRamp {
 
+    private static final int MIN_COLORS = 2;
     private final Color[] colors;
     private final int size;
 
@@ -42,7 +43,7 @@ public final class ColorRamp {
      * @throws IllegalArgumentException si les couleurs sont moins que deux
      */
     public ColorRamp(Color... colors) {
-        Preconditions.checkArgument(colors.length >= 2);
+        Preconditions.checkArgument(colors.length >= MIN_COLORS);
 
         size = colors.length;
         this.colors = new Color[size];

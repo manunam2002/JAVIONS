@@ -40,6 +40,10 @@ public final class Main extends Application {
     private final static long SECOND = Duration.ofSeconds(1).toNanos();
     private static final int MIN_WIDTH = 800;
     private static final int MIN_HEIGHT = 600;
+    private static final String DATABASE = "/aircraft.zip";
+    private static final String TILE_CACHE = "tile-cache";
+    private static final String SERVER_NAME = "tile.openstreetmap.org";
+    private static final String JAVIONS = "Javions";
     private long lastPurge;
 
     /**
@@ -63,14 +67,14 @@ public final class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        URL u = getClass().getResource("/aircraft.zip");
+        URL u = getClass().getResource(DATABASE);
         assert u != null;
         Path p = Path.of(u.toURI());
         AircraftDatabase db = new AircraftDatabase(p.toString());
 
-        Path tileCache = Path.of("tile-cache");
+        Path tileCache = Path.of(TILE_CACHE);
 
-        TileManager tm = new TileManager(tileCache, "tile.openstreetmap.org");
+        TileManager tm = new TileManager(tileCache, SERVER_NAME);
 
         MapParameters mp = new MapParameters(8, 33_530, 23_070);
 
@@ -96,7 +100,7 @@ public final class Main extends Application {
         SplitPane splitPane = new SplitPane(stackPane, borderPane);
         splitPane.orientationProperty().set(Orientation.VERTICAL);
 
-        primaryStage.setTitle("Javions");
+        primaryStage.setTitle(JAVIONS);
         primaryStage.setScene(new Scene(splitPane));
         primaryStage.setMinWidth(MIN_WIDTH);
         primaryStage.setMinHeight(MIN_HEIGHT);

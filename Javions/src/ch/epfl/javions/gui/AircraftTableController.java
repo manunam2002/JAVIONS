@@ -28,6 +28,8 @@ import java.util.function.Consumer;
 public class AircraftTableController {
 
     private static final int NUMERIC_COLUMN_WIDTH = 85;
+    private static final String TABLE_CSS = "table.css";
+    private static final String NUMERIC = "numeric";
     private final TableView<ObservableAircraftState> pane;
     private Consumer<ObservableAircraftState> doubleClickConsumer;
 
@@ -41,7 +43,7 @@ public class AircraftTableController {
                                    ObjectProperty<ObservableAircraftState> selectedAircraft) {
 
         pane = new TableView<>();
-        pane.getStylesheets().add("table.css");
+        pane.getStylesheets().add(TABLE_CSS);
         pane.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         pane.setTableMenuButtonVisible(true);
 
@@ -150,7 +152,7 @@ public class AircraftTableController {
                                             ObservableValue<String>> value) {
         TableColumn<ObservableAircraftState, String> column = new TableColumn<>(title);
         column.setPrefWidth(NUMERIC_COLUMN_WIDTH);
-        column.getStyleClass().add("numeric");
+        column.getStyleClass().add(NUMERIC);
         column.setCellValueFactory(value);
 
         column.setComparator((s1, s2) -> {

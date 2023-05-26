@@ -13,10 +13,11 @@ import javafx.scene.text.Text;
  */
 public final class StatusLineController {
 
+    private static final String LEFT_TEXT = "Aéronefs visibles : ";
+    private static final String RIGHT_TEXT = "Messages reçus : ";
+    private static final String STATUS_CSS = "status.css";
     private final BorderPane pane;
-
     private final SimpleIntegerProperty aircraftCountProperty = new SimpleIntegerProperty(0);
-
     private final SimpleLongProperty messageCountProperty = new SimpleLongProperty(0);
 
     /**
@@ -25,13 +26,13 @@ public final class StatusLineController {
     public StatusLineController() {
 
         Text left = new Text();
-        left.textProperty().bind(aircraftCountProperty.map(i -> "Aéronefs visibles : "+i));
+        left.textProperty().bind(aircraftCountProperty.map(i -> LEFT_TEXT +i));
 
         Text right = new Text();
-        right.textProperty().bind(messageCountProperty.map(i -> "Messages reçus : "+i));
+        right.textProperty().bind(messageCountProperty.map(i -> RIGHT_TEXT +i));
 
         pane = new BorderPane(null, null, right, null, left);
-        pane.getStylesheets().add("status.css");
+        pane.getStylesheets().add(STATUS_CSS);
     }
 
     /**

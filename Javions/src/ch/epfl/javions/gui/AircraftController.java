@@ -35,6 +35,13 @@ import static javafx.scene.paint.CycleMethod.NO_CYCLE;
  */
 public final class AircraftController {
 
+    private static final String AIRCRAFT_CSS = "aircraft.css";
+    private static final String TRAJECTORY = "trajectory";
+    private static final String LABEL = "label";
+    private static final String AIRCRAFT = "aircraft";
+    private static final String UNKNOWN = "?";
+    private static final String EMPTY_STRING = "";
+    private static final int ALTITUDE_DIVISOR = 12000;
     private final MapParameters mapParameters;
     private final ObjectProperty<ObservableAircraftState> selectedAircraft;
     private final Pane pane;
@@ -54,7 +61,7 @@ public final class AircraftController {
 
         pane = new Pane();
         pane.setPickOnBounds(false);
-        pane.getStylesheets().add("aircraft.css");
+        pane.getStylesheets().add(AIRCRAFT_CSS);
 
         states.addListener((SetChangeListener<ObservableAircraftState>)
                 change -> {
@@ -105,7 +112,7 @@ public final class AircraftController {
      */
     private void addTrajectory(ObservableAircraftState aircraftState, Group aircraftGroup) {
         Group trajectory = new Group();
-        trajectory.getStyleClass().add("trajectory");
+        trajectory.getStyleClass().add(TRAJECTORY);
         aircraftGroup.getChildren().add(trajectory);
 
         trajectory.layoutXProperty().bind(mapParameters.minXProperty().negate());
@@ -197,7 +204,7 @@ public final class AircraftController {
      */
     private void addLabel(ObservableAircraftState aircraftState, Group iconAndLabelGroup) {
         Group label = new Group();
-        label.getStyleClass().add("label");
+        label.getStyleClass().add(LABEL);
         iconAndLabelGroup.getChildren().add(label);
 
         label.visibleProperty().bind(Bindings.createBooleanBinding(() ->
@@ -212,10 +219,10 @@ public final class AircraftController {
                         otherwise(aircraftState.getIcaoAddress().string());
 
         StringBinding line1 = Bindings.createStringBinding(() -> {
-            String velocity = (Double.isNaN(aircraftState.getVelocity())) ? "?" :
+            String velocity = (Double.isNaN(aircraftState.getVelocity())) ? UNKNOWN :
                     String.format("%.0f", Units.convert(aircraftState.getVelocity(),
                             Units.Speed.METER_PER_SECOND, Units.Speed.KILOMETER_PER_HOUR));
-            String altitude = (Double.isNaN(aircraftState.getAltitude())) ? "?" :
+            String altitude = (Double.isNaN(aircraftState.getAltitude())) ? UNKNOWN :
                     String.format("%.0f", aircraftState.getAltitude());
             return String.format("%s km/h\u2002%s m", velocity, altitude);
         }, aircraftState.velocityProperty(), aircraftState.altitudeProperty());
@@ -238,13 +245,15 @@ public final class AircraftController {
      */
     private void addIcon(ObservableAircraftState aircraftState, Group iconAndLabelGroup) {
         SVGPath icon = new SVGPath();
-        icon.getStyleClass().add("aircraft");
+        icon.getStyleClass().add(AIRCRAFT);
         iconAndLabelGroup.getChildren().add(icon);
 
         ObjectBinding<AircraftIcon> aircraftIcon = (Objects.isNull(aircraftState.getAircraftData())) ?
                 Bindings.createObjectBinding(() ->
-                        AircraftIcon.iconFor(new AircraftTypeDesignator(""), new AircraftDescription(""),
-                                aircraftState.getCategory(), WakeTurbulenceCategory.of("")),
+                        AircraftIcon.iconFor(new AircraftTypeDesignator(EMPTY_STRING),
+                                new AircraftDescription(EMPTY_STRING),
+                                aircraftState.getCategory(),
+                                WakeTurbulenceCategory.of(EMPTY_STRING)),
                         aircraftState.categoryProperty()) :
                 Bindings.createObjectBinding(() ->
                         AircraftIcon.iconFor(aircraftState.getAircraftData().typeDesignator(),
@@ -269,6 +278,6 @@ public final class AircraftController {
      * @return la couleur correspondante
      */
     private Color plasmaAt(double value) {
-        return ColorRamp.PLASMA.at(Math.cbrt(value / 12000));
+        return ColorRamp.PLASMA.at(Math.cbrt(value / ALTITUDE_DIVISOR));
     }
 }

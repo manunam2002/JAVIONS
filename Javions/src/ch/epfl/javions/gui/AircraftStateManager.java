@@ -96,6 +96,7 @@ public final class AircraftStateManager {
 
     /**
      * ajoute l'état d'un aéronef à l'ensemble observable des états si sa position n'est pas nulle
+     *
      * @param state l'état d'un aéronef
      */
     private void addToStates(ObservableAircraftState state){

@@ -71,11 +71,13 @@ public class BaseMapController {
     }
 
     /**
-     * ajoute tous les gestionnaires dévènements
+     * ajoute tous les gestionnaires dévènements qui gèrènt le zoom et le déplacement sur la carte
+     *
      * @param mapParameters les paramètres de la carte
      */
     private void addEventHandlers(MapParameters mapParameters) {
         LongProperty minScrollTime = new SimpleLongProperty();
+
         pane.setOnScroll(e -> {
             int zoomDelta = (int) Math.signum(e.getDeltaY());
             if (zoomDelta == 0) return;
@@ -101,7 +103,9 @@ public class BaseMapController {
     }
 
     /**
-     * ajoute tous les auditeurs
+     * ajoute tous les auditeurs à la dimension de la fenètre et au paramètres de la carte,
+     * qui redessinent la carte lorsque c'est necessaire
+     *
      * @param mapParameters les paramètres de la carte
      */
     private void addListeners(MapParameters mapParameters) {

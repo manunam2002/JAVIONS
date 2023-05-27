@@ -50,8 +50,9 @@ public class AircraftTableController {
         addAllColumns();
 
         addListeners(states, selectedAircraft);
+        addEventHandler(selectedAircraft);
 
-        addEventHandlers(selectedAircraft);
+        pane.getItems().addAll(states);
     }
 
     public TableView<ObservableAircraftState> pane() {
@@ -63,7 +64,7 @@ public class AircraftTableController {
     }
 
     /**
-     * ajoute toutes les colonnes à la table
+     * crée et ajoute toutes les colonnes à la table
      */
     private void addAllColumns() {
         TableColumn<ObservableAircraftState, String> iCAOColumn = createTextColumn("OACI", 60,
@@ -112,8 +113,11 @@ public class AircraftTableController {
     }
 
     /**
-     * ajoute tous les auditeurs
-     * @param states l'ensemble des états des aéronefs
+     * ajoute un auditeur à l'ensemble des états observables qui ajoute ou supprime de la table
+     * les aéronefs qui lui sont ajoutées ou supprimés,
+     * et ajoute les auditeurs à la propriété de l'aéronef selectionné et à la propiété de selection de la table
+     *
+     * @param states           l'ensemble des états des aéronefs
      * @param selectedAircraft la propriété de l'aéronef selectionné
      */
     private void addListeners(ObservableSet<ObservableAircraftState> states,
@@ -129,8 +133,6 @@ public class AircraftTableController {
                     }
                 });
 
-        pane.getItems().addAll(states);
-
         selectedAircraft.addListener((p, o, n) -> {
             pane.getSelectionModel().select(n);
             pane.scrollTo(n);
@@ -140,10 +142,11 @@ public class AircraftTableController {
     }
 
     /**
-     * ajoute les gestionnaires d'évènements
+     * ajoute le gestionnaire d'évènement pour un double click sur la table
+     *
      * @param selectedAircraft la propriété de l'aéronef selectionné
      */
-    private void addEventHandlers(ObjectProperty<ObservableAircraftState> selectedAircraft) {
+    private void addEventHandler(ObjectProperty<ObservableAircraftState> selectedAircraft) {
         pane.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2 && e.getButton() == MouseButton.PRIMARY
                     && Objects.nonNull(doubleClickConsumer) && Objects.nonNull(selectedAircraft.get())) {

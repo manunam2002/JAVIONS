@@ -63,7 +63,7 @@ public final class AircraftController {
         pane.setPickOnBounds(false);
         pane.getStylesheets().add(AIRCRAFT_CSS);
 
-        addListeners(states);
+        addListener(states);
 
         for (ObservableAircraftState aircraftState : states) {
             addGroup(aircraftState);
@@ -80,11 +80,13 @@ public final class AircraftController {
     }
 
     /**
-     * ajoute l'auditeur à l'ensemble des états des aéronefs
+     * ajoute l'auditeur à l'ensemble des états des aéronefs, qui ajoute ou supprime les aéronefs de la vue,
+     * quand ils sont ajoutés ou supprimés de l'ensemble
+     *
+     * @param states l'ensemble des états des aéronefs
      */
-    private void addListeners(ObservableSet<ObservableAircraftState> states){
-        states.addListener((SetChangeListener<ObservableAircraftState>)
-                change -> {
+    private void addListener(ObservableSet<ObservableAircraftState> states){
+        states.addListener((SetChangeListener<ObservableAircraftState>) change -> {
                     if (change.wasAdded()) {
                         addGroup(change.getElementAdded());
                     }
@@ -101,26 +103,22 @@ public final class AircraftController {
      * @param aircraftState l'état de l'aéronef
      */
     private void addGroup(ObservableAircraftState aircraftState) {
-        Group aircraftGroup = new Group(); //TODO : methodes retournent groupes à mettre directement dans le constructeur
-        pane.getChildren().add(aircraftGroup);
+        Group aircraftGroup = new Group(trajectoryGroup(aircraftState), iconAndLabelGroup(aircraftState));
         aircraftGroup.setId(aircraftState.getIcaoAddress().string());
         aircraftGroup.viewOrderProperty().bind(aircraftState.altitudeProperty().negate());
 
-        addTrajectory(aircraftState, aircraftGroup);
-
-        addIconAndLabel(aircraftState, aircraftGroup);
+        pane.getChildren().add(aircraftGroup);
     }
 
     /**
-     * ajoute le groupe de la trajectoire au groupe de l'aéronef
+     * crée le groupe de la trajectoire à ajouter au groupe de l'aéronef
      *
      * @param aircraftState l'état de l'aéronef
-     * @param aircraftGroup le groupe de l'aéronef
+     * @return le groupe de la trajectoire à ajouter au groupe de l'aéronef
      */
-    private void addTrajectory(ObservableAircraftState aircraftState, Group aircraftGroup) {
+    private Group trajectoryGroup(ObservableAircraftState aircraftState) {
         Group trajectory = new Group();
         trajectory.getStyleClass().add(TRAJECTORY);
-        aircraftGroup.getChildren().add(trajectory);
 
         trajectory.layoutXProperty().bind(mapParameters.minXProperty().negate());
         trajectory.layoutYProperty().bind(mapParameters.minYProperty().negate());
@@ -140,15 +138,19 @@ public final class AircraftController {
             if (aircraftState.equals(selectedAircraft.get()))
                 createTrajectory(aircraftState, trajectory);
         });
+
+        return trajectory;
     }
 
     /**
-     * crée toutes les lignes de la trajectoire
+     * crée toutes les lignes de la trajectoire et les ajoute au groupe de la trajectoire
      *
      * @param aircraftState l'état de l'aéronef
      * @param trajectory    le groupe de la trajectoire
      */
     private void createTrajectory(ObservableAircraftState aircraftState, Group trajectory) {
+        trajectory.getChildren().clear();
+
         ArrayList<Line> trajectoryLines = new ArrayList<>();
         List<ObservableAircraftState.AirbornePos> t = aircraftState.getTrajectory();
         double startX = WebMercator.x(mapParameters.zoom(), t.get(0).position().longitude());
@@ -177,14 +179,13 @@ public final class AircraftController {
     }
 
     /**
-     * ajoute le groupe de l'icone et de l'étiquette au groupe de l'aéronef
+     * crée le groupe de l'icone et de l'étiquette à ajouter au groupe de l'aéronef
      *
      * @param aircraftState l'état de l'aéronef
-     * @param aircraftGroup le groupe de l'aéronef
+     * @return le groupe de l'icone et de l'étiquette à ajouter au groupe de l'aéronef
      */
-    private void addIconAndLabel(ObservableAircraftState aircraftState, Group aircraftGroup) {
-        Group iconAndLabelGroup = new Group();
-        aircraftGroup.getChildren().add(iconAndLabelGroup);
+    private Group iconAndLabelGroup(ObservableAircraftState aircraftState) {
+        Group iconAndLabelGroup = new Group(labelGroup(aircraftState), iconGroup(aircraftState));
 
         iconAndLabelGroup.layoutXProperty().bind(Bindings.createDoubleBinding(() ->
                         WebMercator.x(mapParameters.zoom(),
@@ -199,25 +200,16 @@ public final class AircraftController {
                 aircraftState.positionProperty(),
                 mapParameters.minYProperty()));
 
-        addLabel(aircraftState, iconAndLabelGroup);
-        addIcon(aircraftState, iconAndLabelGroup);
+        return iconAndLabelGroup;
     }
 
     /**
-     * crée le groupe de l'étiquette et l'ajoute au groupe de l'icone et de l'étiquette
+     * crée le groupe de l'étiquette à ajouter au groupe de l'icone et de l'étiquette
      *
-     * @param aircraftState     l'état de l'aéronef
-     * @param iconAndLabelGroup le groupe de l'icone et de l'étiquette
+     * @param aircraftState l'état de l'aéronef
+     * @return le groupe de l'étiquette à ajouter au groupe de l'icone et de l'étiquette
      */
-    private void addLabel(ObservableAircraftState aircraftState, Group iconAndLabelGroup) {
-        Group label = new Group();
-        label.getStyleClass().add(LABEL);
-        iconAndLabelGroup.getChildren().add(label);
-
-        label.visibleProperty().bind(Bindings.createBooleanBinding(() ->
-                        mapParameters.zoom() >= 11 || (aircraftState.equals(selectedAircraft.get())),
-                mapParameters.zoomProperty(), selectedAircraft));
-
+    private Group labelGroup(ObservableAircraftState aircraftState) {
         Object line0 = (Objects.nonNull(aircraftState.getAircraftData()) &&
                 !aircraftState.getAircraftData().registration().string().isEmpty()) ?
             aircraftState.getAircraftData().registration().string() :
@@ -241,19 +233,25 @@ public final class AircraftController {
         rectangle.widthProperty().bind(text.layoutBoundsProperty().map(b -> b.getWidth() + 4));
         rectangle.heightProperty().bind(text.layoutBoundsProperty().map(b -> b.getHeight() + 4));
 
-        label.getChildren().addAll(rectangle, text);
+        Group label = new Group(rectangle, text);
+        label.getStyleClass().add(LABEL);
+
+        label.visibleProperty().bind(Bindings.createBooleanBinding(() ->
+                        mapParameters.zoom() >= 11 || (aircraftState.equals(selectedAircraft.get())),
+                mapParameters.zoomProperty(), selectedAircraft));
+
+        return label;
     }
 
     /**
-     * crée le groupe de l'icone et l'ajoute au groupe de l'étiquette et de l'icone
+     * crée le groupe de l'icone à ajouter au groupe de l'étiquette et de l'icone
      *
-     * @param aircraftState     l'état de l'aéronef
-     * @param iconAndLabelGroup le groupe de l'étiquette et de l'icone
+     * @param aircraftState l'état de l'aéronef
+     * @return le groupe de l'icone à ajouter au groupe de l'étiquette et de l'icone
      */
-    private void addIcon(ObservableAircraftState aircraftState, Group iconAndLabelGroup) {
+    private SVGPath iconGroup(ObservableAircraftState aircraftState) {
         SVGPath icon = new SVGPath();
         icon.getStyleClass().add(AIRCRAFT);
-        iconAndLabelGroup.getChildren().add(icon);
 
         ObjectBinding<AircraftIcon> aircraftIcon = (Objects.isNull(aircraftState.getAircraftData())) ?
                 Bindings.createObjectBinding(() ->
@@ -276,6 +274,8 @@ public final class AircraftController {
         icon.fillProperty().bind(aircraftState.altitudeProperty().map(a -> plasmaAt((Double)a)));
 
         icon.setOnMouseClicked(e -> selectedAircraft.set(aircraftState));
+
+        return icon;
     }
 
     /**

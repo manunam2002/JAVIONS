@@ -40,7 +40,6 @@ public final class ColorRamp {
      * constructeur public
      *
      * @param colors la séquence de couleurs spécifiant le dégradé
-     * @throws IllegalArgumentException si les couleurs sont moins que deux
      */
     public ColorRamp(Color... colors) {
         Preconditions.checkArgument(colors.length >= MIN_COLORS);

@@ -16,7 +16,6 @@ import javafx.util.Callback;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -113,9 +112,9 @@ public class AircraftTableController {
     }
 
     /**
-     * ajoute un auditeur à l'ensemble des états observables qui ajoute ou supprime de la table
-     * les aéronefs qui lui sont ajoutées ou supprimés,
-     * et ajoute les auditeurs à la propriété de l'aéronef selectionné et à la propiété de selection de la table
+     * ajoute un auditeur à l'ensemble des états observables qui ajoute (supprime) de la table
+     * les aéronefs qui lui sont ajoutées (supprimés), et ajoute les auditeurs à la propriété
+     * de l'aéronef selectionné et à la propiété de selection de la table
      *
      * @param states           l'ensemble des états des aéronefs
      * @param selectedAircraft la propriété de l'aéronef selectionné
@@ -149,7 +148,7 @@ public class AircraftTableController {
     private void addEventHandler(ObjectProperty<ObservableAircraftState> selectedAircraft) {
         pane.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2 && e.getButton() == MouseButton.PRIMARY
-                    && Objects.nonNull(doubleClickConsumer) && Objects.nonNull(selectedAircraft.get())) {
+                    && doubleClickConsumer != null && selectedAircraft.get() != null) {
                 doubleClickConsumer.accept(selectedAircraft.get());
             }
         });

@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.lang.Thread.sleep;
@@ -61,8 +62,6 @@ public final class Main extends Application {
      * chargé de mettre à jour les états d'aéronefs en fonction des messages reçus
      *
      * @param primaryStage la scène principale de cette application
-     *
-     * @throws RuntimeException en cas d'erreur d'entrée/sortie ou en cas d'interruption du fil d'execution
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -109,36 +108,7 @@ public final class Main extends Application {
         ConcurrentLinkedQueue<Message> queue = new ConcurrentLinkedQueue<>();
 
         Thread thread = (getParameters().getRaw().isEmpty()) ?
-                new Thread(() -> {
-                    try {
-                        AdsbDemodulator demodulator = new AdsbDemodulator(System.in);
-                        RawMessage rm;
-                        while ((rm = demodulator.nextMessage()) != null) {
-                            Message m = MessageParser.parse(rm);
-                            if (m != null) {
-                                queue.add(m);
-                            }
-                        }
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                }) :
-                new Thread(() -> {
-                    long start = System.nanoTime();
-                    String file = getParameters().getRaw().get(0);
-                    try {
-                        long time;
-                        for (Message m : readAllMessages(file)) {
-                            time = System.nanoTime();
-                            if ((time - start) < m.timeStampNs()) {
-                                sleep(Duration.ofNanos(m.timeStampNs() + start - time).toMillis());
-                            }
-                            queue.add(m);
-                        }
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                createSystemInThread(queue) : createFileThread(queue);
 
         thread.setDaemon(true);
         thread.start();
@@ -152,12 +122,12 @@ public final class Main extends Application {
                     try {
                         asm.updateWithMessage(queue.remove());
                         mcp.set(mcp.get() + 1);
-                        if (now - lastPurge >= SECOND){
+                        if (now - lastPurge >= SECOND/10){
                             asm.purge();
                             lastPurge = now;
                         }
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new UncheckedIOException(e);
                     }
                 }
             }
@@ -191,5 +161,55 @@ public final class Main extends Application {
         } catch (EOFException e) {
             return l;
         }
+    }
+
+    /**
+     * crée le Thread qui lit et démodule les messages depuis la radio
+     *
+     * @param queue la queue où sont ajoutées les messages valides
+     * @return le Thread qui lit et démodule les messages depuis la radio
+     */
+    private Thread createSystemInThread(Queue<Message> queue){
+        return new Thread(() -> {
+            try {
+                AdsbDemodulator demodulator = new AdsbDemodulator(System.in);
+                RawMessage rm;
+                while ((rm = demodulator.nextMessage()) != null) {
+                    Message m = MessageParser.parse(rm);
+                    if (m != null) {
+                        queue.add(m);
+                    }
+                }
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        });
+    }
+
+    /**
+     * crée le Thread qui lit les messages depuis un fichier
+     *
+     * @param queue la queue où sont ajoutées les messages valides
+     * @return le Thread qui lit les messages depuis un fichier
+     */
+    private Thread createFileThread(Queue<Message> queue){
+        return new Thread(() -> {
+            long start = System.nanoTime();
+            String file = getParameters().getRaw().get(0);
+            try {
+                long time;
+                for (Message m : readAllMessages(file)) {
+                    time = System.nanoTime();
+                    if ((time - start) < m.timeStampNs()/10) {
+                        sleep(Duration.ofNanos(m.timeStampNs()/10 + start - time).toMillis());
+                    }
+                    queue.add(m);
+                }
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            } catch (InterruptedException e) {
+                throw new Error(e);
+            }
+        });
     }
 }

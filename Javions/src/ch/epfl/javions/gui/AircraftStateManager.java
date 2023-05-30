@@ -100,7 +100,7 @@ public final class AircraftStateManager {
      * @param state l'état d'un aéronef
      */
     private void addToStates(ObservableAircraftState state){
-        if (Objects.nonNull(state.getPosition())) {
+        if (state.getPosition() != null) {
             observableAircraftStates.add(state);
         }
     }

@@ -71,7 +71,7 @@ public class BaseMapController {
     }
 
     /**
-     * ajoute tous les gestionnaires dévènements qui gèrènt le zoom et le déplacement sur la carte
+     * ajoute tous les gestionnaires d'évènements qui gèrènt le zoom et le déplacement sur la carte
      *
      * @param mapParameters les paramètres de la carte
      */
@@ -103,7 +103,7 @@ public class BaseMapController {
     }
 
     /**
-     * ajoute tous les auditeurs à la dimension de la fenètre et au paramètres de la carte,
+     * ajoute tous les auditeurs à la dimension de la fenètre et aux paramètres de la carte,
      * qui redessinent la carte lorsque c'est necessaire
      *
      * @param mapParameters les paramètres de la carte
@@ -144,7 +144,6 @@ public class BaseMapController {
      * dessinne la carte sur le panneau
      */
     private void draw() {
-
         int X = (int) Math.floor(mapParameters.minX() / TILE_PIXELS);
         int Y = (int) Math.floor(mapParameters.minY() / TILE_PIXELS);
         double deltaX = mapParameters.minX() - X * TILE_PIXELS;
@@ -152,6 +151,7 @@ public class BaseMapController {
         double height = (canvas.getHeight() + deltaY)/ TILE_PIXELS;
         double width = (canvas.getWidth() + deltaX)/ TILE_PIXELS;
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
+        graphicsContext.clearRect(0,0,canvas.getWidth(), canvas.getHeight());
 
         for (int i = 0; i <= width; i += 1) {
             for (int j = 0; j <= height; j += 1) {

@@ -80,8 +80,8 @@ public final class AircraftController {
     }
 
     /**
-     * ajoute l'auditeur à l'ensemble des états des aéronefs, qui ajoute ou supprime les aéronefs de la vue,
-     * quand ils sont ajoutés ou supprimés de l'ensemble
+     * ajoute l'auditeur à l'ensemble des états des aéronefs, qui ajoute (supprime) les aéronefs de la vue,
+     * quand ils sont ajoutés (supprimés) de l'ensemble
      *
      * @param states l'ensemble des états des aéronefs
      */
@@ -210,7 +210,7 @@ public final class AircraftController {
      * @return le groupe de l'étiquette à ajouter au groupe de l'icone et de l'étiquette
      */
     private Group labelGroup(ObservableAircraftState aircraftState) {
-        Object line0 = (Objects.nonNull(aircraftState.getAircraftData()) &&
+        Object line0 = (aircraftState.getAircraftData() != null &&
                 !aircraftState.getAircraftData().registration().string().isEmpty()) ?
             aircraftState.getAircraftData().registration().string() :
                 Bindings.when(aircraftState.callSignProperty().isNotNull()).
@@ -253,7 +253,7 @@ public final class AircraftController {
         SVGPath icon = new SVGPath();
         icon.getStyleClass().add(AIRCRAFT);
 
-        ObjectBinding<AircraftIcon> aircraftIcon = (Objects.isNull(aircraftState.getAircraftData())) ?
+        ObjectBinding<AircraftIcon> aircraftIcon = (aircraftState.getAircraftData() == null) ?
                 Bindings.createObjectBinding(() ->
                         AircraftIcon.iconFor(new AircraftTypeDesignator(EMPTY_STRING),
                                 new AircraftDescription(EMPTY_STRING),
